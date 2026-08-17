@@ -1,0 +1,34 @@
+= 💡 Solution: Scenario 4 - Execution Environment credentials
+
+This page provides the detailed solution for the issue presented in Scenario 4. Review these steps after you have attempted the diagnosis and resolution yourself.
+
+---
+
+== 🛑 Problem: Missing Execution Environment credential
+
+=== Diagnosis
+
+One of the job templates was configured to use an *Execution Environment (EE)* image hosted in a private container registry (e.g., a Quay repository). The job failed because the necessary *Container Registry Credential* was not linked to the job template, resulting in an image pull failure.
+
+The error message in the failed job's output confirms the authentication failure when attempting to pull the EE image.
+
+=== 🛠️ Resolution: Switching the Execution Environment
+
+The solution is to modify the failing job template to reference an Execution Environment that is properly authenticated or publicly accessible.
+
+==== 1. Identify and edit the failing job template
+
+In the *AAP UI*, navigate to *Automation Execution → Templates*. Select the template that failed execution (SUMMIT-T4).
+
+==== 2. Change the Execution Environment
+
+Edit the job template configuration and switch the *Execution Environment* field to match the image being successfully used by the other job templates (Default Execution Environment).
+
+[NOTE]
+====
+The failing template was using an EE from a private Quay repository without a matching credential. Switching it to a known good EE resolves the authentication gap.
+====
+
+==== 3. Verification
+
+Save the configuration and launch the job template again. The job will successfully start, confirming the EE image is now pulled correctly.

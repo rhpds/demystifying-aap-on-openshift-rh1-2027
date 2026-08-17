@@ -1,0 +1,89 @@
+= Demystifying Ansible Automation Platform on OpenShift Container Platform
+:page-layout: home
+
+[#welcome]
+== Welcome to the Lab!
+
+Welcome to the *Demystifying Ansible Automation Platform (AAP) on OpenShift Container Platform (OCP)* lab!
+
+In this lab you will troubleshoot real-world Ansible Automation Platform deployments running on OpenShift. Each scenario focuses on a different AAP component and presents a broken environment for you to diagnose and fix. No prior knowledge of the fix is expected. Your job is to observe, investigate, and reason through the problem.
+
+[#environment]
+== Your environment
+
+Your environment consists of 4 dedicated AAP instances already deployed on OpenShift — one per scenario. There is no bastion host. All interaction happens through:
+
+* The *AAP tab for your current scenario* on the right side of this page.
+* The *OpenShift Console* accessible via the top navigation.
+
+[WARNING]
+====
+Your showroom has *4 separate AAP tabs*, one per scenario. Always make sure you are working in the correct tab before logging in or running job templates. Using the wrong AAP instance will lead to unexpected results.
+
+[cols="1,2",options="header"]
+|===
+| Tab | Scenario
+| *AAP - Scenario 1 (Hub)* | Scenario 1: Automation Hub storage issue
+| *AAP - Scenario 2 (Gateway)* | Scenario 2: Gateway issues
+| *AAP - Scenario 3 (Node Selector)* | Scenario 3: Node selector issue
+| *AAP - Scenario 4 (ALIA)* | Scenario 4: ALIA — Ansible Lightspeed issues
+|===
+====
+
+[#credentials]
+== Your credentials
+
+Use the following credentials to log into AAP via the tab on the right:
+
+[cols="1,2",options="header"]
+|===
+| Field | Value
+| *Username* | admin
+| *Password* | {password}
+|===
+
+[TIP]
+====
+The AAP tab on the right side of this page is already pointing to your AAP instance.
+====
+
+[#ocp-console]
+== OpenShift Console
+
+The OpenShift Console is embedded and accessible via the top navigation bar. Use it to inspect pods, events, storage, and other cluster resources as you troubleshoot.
+
+[cols="1,2",options="header"]
+|===
+| Field | Value
+| *Username* | {user}
+| *Password* | {password}
+|===
+
+[#scenarios]
+== Lab scenarios
+
+Each scenario presents a broken AAP deployment; your goal is to identify the root cause and restore full functionality.
+
+[cols="1,1,3",options="header"]
+|===
+| Scenario | Component | Description
+| 1 | Automation Hub | Hub fails to start due to a storage configuration issue
+| 2 | Automation Controller + Hub | Wrong admin password / Database service missing
+| 3 | Automation Controller + Hub | Wrong node selector / High resource requests
+| 4 | Ansible Lightspeed (ALIA) | ALIA chat assistant not responding due to wrong model configuration
+|===
+
+[#how-it-works]
+== How the lab works
+
+. *Your environment is already deployed.* AAP is running on OpenShift in a namespace dedicated to you.
+. *You introduce the break.* For scenarios 2-4, log into AAP and run the *Break Scenario* job template in the Controller. This applies the failure for your scenario. For scenario 1, the environment is already broken (no action needed).
+. *You investigate and fix the issue.* Use the AAP UI and OpenShift Console to diagnose the problem and restore full functionality.
+. *Refer to the solution page* if you need guidance after attempting the diagnosis yourself.
+
+[NOTE]
+====
+You are not expected to know the fix upfront; the goal is to practice the investigation process and learn where to look in AAP on OCP.
+====
+
+Navigate to your scenario using the left-hand menu to get started. *Good luck!*

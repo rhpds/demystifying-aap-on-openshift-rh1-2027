@@ -1,0 +1,34 @@
+---
+site:
+  title: Demystifying Ansible Automation Platform on OpenShift Container Platform Lab
+  url: https://rhpds.github.io/demystifying-aap-on-ocp-showroom
+  start_page: modules::index.adoc
+
+content:
+  sources:
+    - url: .
+      start_path: content
+
+ui:
+  bundle:
+    url: https://github.com/rhpds/rhdp_showroom_theme/releases/download/summit-2026/ui-bundle.zip
+    snapshot: true
+  supplemental_files:
+    - path: ./content/supplemental-ui
+    - path: ./content/lib
+    - path: .nojekyll
+    - path: ui.yml
+      contents: "static_files: [ .nojekyll, css/site-extra.css, js/buttons.js ]"
+
+runtime:
+  fetch: true
+  cache_dir: ./.cache/antora
+
+antora:
+  extensions:
+    - require: ./content/lib/dev-mode.js
+      enabled: false
+    - require: ./content/lib/inject-buttons.js
+
+output:
+  dir: ./www

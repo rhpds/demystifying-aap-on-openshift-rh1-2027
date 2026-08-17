@@ -1,0 +1,53 @@
+---
+- name: Validate Module 05 — Hub File Storage Size
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    _token: "{{ lookup('file', '/var/run/secrets/kubernetes.io/serviceaccount/token') }}"
+
+  tasks:
+    - name: Read namespace from service account
+      ansible.builtin.slurp:
+        src: /var/run/secrets/kubernetes.io/serviceaccount/namespace
+      register: r_ns
+
+    - name: Set namespace and CR name facts
+      ansible.builtin.set_fact:
+        current_namespace: "{{ r_ns.content | b64decode | trim }}"
+        aap_cr_name: "{{ r_ns.content | b64decode | trim | regex_replace('-scenario-[0-9]+$', '') }}-aap"
+
+    - name: Get AutomationHub CR
+      ansible.builtin.uri:
+        url: "https://kubernetes.default.svc/apis/automationhub.ansible.com/v1beta1/namespaces/{{ current_namespace }}/automationhubs/{{ aap_cr_name }}-hub"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ _token }}"
+        validate_certs: false
+        status_code: [200, 404]
+      register: r_hub_cr
+
+    - name: Parse file storage size from AutomationHub CR
+      ansible.builtin.set_fact:
+        file_storage_mi: >-
+          {{
+            r_hub_cr.json.spec.file_storage_size
+            | default('0Mi')
+            | regex_replace('Gi$', '000')
+            | regex_replace('Mi$', '')
+            | int
+          }}
+      when: r_hub_cr.status == 200
+
+    - name: Evaluate checks
+      ansible.builtin.set_fact:
+        file_storage_ok: "{{ (file_storage_mi | default(0) | int) >= 1000 }}"
+
+    - name: Validate all tasks
+      validation_check:
+        check: "{{ file_storage_ok }}"
+        pass_msg: |
+          ✅ Hub file storage size is adequate (>= 1Gi)
+        error_msg: |
+          {{ '✅' if file_storage_ok else '❌' }} Hub file storage size is adequate (>= 1Gi)

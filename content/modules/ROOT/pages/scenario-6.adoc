@@ -1,0 +1,106 @@
+= Scenario 4: ALIA — Ansible Lightspeed issues
+
+[cols="3",options="header"]
+|===
+| Difficulty | Components | Break Type
+| Hard | Ansible Lightspeed Intelligent Assistant (ALIA) | Wrong LLM model configuration
+|===
+
+== Objectives
+
+* Log in to the *AAP Gateway UI* successfully.
+* Observe that the *ALIA* chat icon is missing from the interface.
++
+image::chat_icon.png[Reference of the ALIA chat icon, width=317, align="left", link=self, window=_blank]
+* Diagnose the underlying issue preventing the ALIA UI component from activating.
+* Resolve the issue to restore the assistant.
+
+[IMPORTANT]
+====
+Use the *AAP - Scenario 4 (ALIA)* tab in the right-hand panel for this scenario.
+====
+
+== Your ALIA configuration
+
+The LLM connection details for your environment are:
+
+[cols="1,2",options="header"]
+|===
+| Field | Value
+| *Model API URL* | {alia_url}
+| *Model Name* | {alia_model}
+| *API Token* | {alia_token}
+|===
+
+[#credentials]
+== Your credentials
+
+Use the following credentials to log into AAP via the tab on the right:
+
+[cols="1,2",options="header"]
+|===
+| Field | Value
+| *Username* | admin
+| *Password* | {password}
+|===
+
+[#ocp-console]
+== OpenShift Console
+
+Use the following credentials to log into OpenShift via the tab on the right:
+
+[cols="1,2",options="header"]
+|===
+| Field | Value
+| *Username* | {user}
+| *Password* | {password}
+|===
+
+== Troubleshooting
+
+=== Step 1: Run the Break Scenario job
+
+Log into AAP using the *AAP - Scenario 4 (ALIA)* tab. Navigate to *Automation Execution → Templates* and launch the *Break Scenario* job template.
+
+The job template you just ran is configuring the Lightspeed chat bot, it takes a few minutes to deploy. You can watch the `lightspeed-operator-manager` pod logs to see when it is ready.
+
+Please wait for it to complete before proceeding.
+
+=== Step 2: Confirm the ALIA icon is missing
+
+Log into AAP and confirm the chat icon is not visible in the interface.
+
+=== Step 3: Inspect Lightspeed pod logs
+
+Open the *OpenShift Console* and navigate to *Workloads → Pods*. Filter by your namespace.
+
+Identify the `lightspeed-api` and `chatbot` pods and review their *Logs* tabs for connection errors related to the LLM backend.
+
+Note: If you do not see `lightspeed-api` or `lightspeed-chatbot` pods, please verify that the `lightspeed-operator-manager` pod has finished deployment
+
+=== Step 4: Identify the misconfiguration
+
+Compare what the pods are trying to connect to against the correct ALIA configuration values above. The issue will be visible in the pod logs or in the Lightspeed configuration secret.
+
+Navigate to *Workloads → Secrets* in the OpenShift Console to inspect the chatbot configuration secret.
+
+=== Step 5: Fix the issue
+
+Once you have identified the misconfiguration, apply the fix through the OpenShift Console.
+
+Refer to the solution page if needed: xref:scenario-6-solution.adoc[Solution: ALIA Lightspeed issues]
+
+=== Step 6: Verify
+
+After applying the fix and allowing the Lightspeed pods to reconcile, log back into AAP and confirm the ALIA chat icon is now visible and responsive.
+
+== Hint
+
+The ALIA service requires a valid connection to a Large Language Model. Review the logs for the Lightspeed API and chatbot pods; the error will indicate what model or endpoint is being used and why it is failing. Compare this against the correct configuration values shown above.
+
+== Check Your Work
+
+++++
+<div class="validate-button-placeholder" data-module="scenario-6"></div>
+<div class="solve-button-placeholder" data-module="scenario-6"></div>
+++++

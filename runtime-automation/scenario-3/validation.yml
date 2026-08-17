@@ -1,0 +1,67 @@
+---
+- name: Validate Module 03 — Database Node Selector
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    _token: "{{ lookup('file', '/var/run/secrets/kubernetes.io/serviceaccount/token') }}"
+    _pg_label: "app.kubernetes.io%2Fcomponent%3Ddatabase%2Capp.kubernetes.io%2Fname%3Dpostgres-15"
+
+  tasks:
+    - name: Read namespace from service account
+      ansible.builtin.slurp:
+        src: /var/run/secrets/kubernetes.io/serviceaccount/namespace
+      register: r_ns
+
+    - name: Set namespace and CR name facts
+      ansible.builtin.set_fact:
+        current_namespace: "{{ r_ns.content | b64decode | trim }}"
+        aap_cr_name: "{{ r_ns.content | b64decode | trim | regex_replace('-scenario-[0-9]+$', '') }}-aap"
+
+    - name: Get AAP CR
+      ansible.builtin.uri:
+        url: "https://kubernetes.default.svc/apis/aap.ansible.com/v1alpha1/namespaces/{{ current_namespace }}/ansibleautomationplatforms/{{ aap_cr_name }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ _token }}"
+        validate_certs: false
+        status_code: [200, 404]
+      register: r_aap_cr
+
+    - name: Get postgres pod
+      ansible.builtin.uri:
+        url: "https://kubernetes.default.svc/api/v1/namespaces/{{ current_namespace }}/pods?labelSelector={{ _pg_label }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ _token }}"
+        validate_certs: false
+        status_code: [200, 404]
+      register: r_pg_pods
+
+    - name: Evaluate checks
+      ansible.builtin.set_fact:
+        node_selector_clear: >-
+          {{
+            r_aap_cr.status == 200 and
+            (
+              r_aap_cr.json.spec.database is not defined or
+              r_aap_cr.json.spec.database.node_selector is not defined or
+              r_aap_cr.json.spec.database.node_selector | length == 0
+            )
+          }}
+        postgres_running: >-
+          {{
+            r_pg_pods.status == 200 and
+            r_pg_pods.json['items'] | selectattr('status.phase', 'equalto', 'Running') | list | length > 0
+          }}
+
+    - name: Validate all tasks
+      validation_check:
+        check: "{{ node_selector_clear and postgres_running }}"
+        pass_msg: |
+          ✅ AAP CR database.node_selector is cleared
+          ✅ Postgres pod Running
+        error_msg: |
+          {{ '✅' if node_selector_clear else '❌' }} AAP CR database.node_selector is cleared
+          {{ '✅' if postgres_running else '❌' }} Postgres pod Running (not stuck Pending)

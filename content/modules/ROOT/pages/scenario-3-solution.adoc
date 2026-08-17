@@ -1,0 +1,56 @@
+= 💡 Solution: Scenario 3 - Node selector issue
+
+This page provides the detailed solution for the issue presented in Scenario 3. Review these steps after you have attempted the diagnosis and resolution yourself.
+
+---
+
+== 🛑 Database pod scheduling failure
+
+=== Diagnosis
+
+The *PostgreSQL Database* pods were unable to be scheduled because they had an invalid `nodeSelector` assigned in the CR. The scheduler could not find any node matching the criteria, so the pods remained in a `Pending` state indefinitely.
+
+=== 🛠️ Resolution: Correcting node scheduling
+
+The fix involves modifying the database configuration within the main *Ansible Automation Platform Custom Resource (CR)*.
+
+==== 1. Modify the database configuration in the CR
+
+In the *OpenShift Console*:
+
+. Navigate to *Ecosystem → Installed Operators* and select your namespace.
+. Click on *Ansible Automation Platform* in the operator list.
+. Click the *Ansible Automation Platform* tab and click on your AAP instance.
+. Switch to the *YAML* tab.
+
+You have two valid options:
+
+* *Option A: Specify a valid selector*: replace the incorrect `nodeSelector` with a valid label:
++
+[source,yaml]
+----
+spec:
+  database:
+    nodeSelector:
+      kubernetes.io/os: linux
+----
+
+* *Option B: Remove the selector*: delete the `nodeSelector` field entirely from the database section of the CR to allow scheduling on any available node.
+
+---
+
+== ♻️ Final reconciliation
+
+After the CR modification is applied, the Operator must reconcile the environment.
+
+In the *OpenShift Console*, navigate to *Workloads → Pods* and select your namespace.
+
+Then find the Gateway Operator manager pod (`aap-gateway-operator-controller-manager-...`), click the three-dot menu, and select *Delete Pod*.
+
+Find the database pod (`{user}-aap-postgres-15-0`), click the three-dot menu on the right, and select *Delete Pod*.
+
+Wait a minute or two to allow the services to attempt to reconnect to the database. Delete any other pods that are in an errored state.
+
+=== Verification
+
+Monitor *Workloads → Pods* until the database and API pods are successfully redeployed and running. Then log into AAP to confirm full functionality.

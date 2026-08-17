@@ -1,0 +1,76 @@
+= Scenario 3: Node selector issue
+
+[cols="3",options="header"]
+|===
+| Difficulty | Components | Break Type
+| Easy / Medium | Gateway | One issue
+|===
+
+== Objectives
+
+* Log in to the *AAP Gateway UI*.
+* Observe multiple core components failing to deploy or stabilize.
+* Diagnose the issue.
+* Resolve the issue.
+
+[IMPORTANT]
+====
+Use the *AAP - Scenario 3 (Node Selector)* tab in the right-hand panel for this scenario.
+====
+
+[#credentials]
+== Your credentials
+
+Use the following credentials to log into AAP via the tab on the right:
+
+[cols="1,2",options="header"]
+|===
+| Field | Value
+| *Username* | admin
+| *Password* | {password}
+|===
+
+[#ocp-console]
+== OpenShift Console
+
+Use the following credentials to log into OpenShift via the tab on the right:
+
+[cols="1,2",options="header"]
+|===
+| Field | Value
+| *Username* | {user}
+| *Password* | {password}
+|===
+
+== Troubleshooting
+
+=== Step 1: Run the Break Scenario job
+
+Log into AAP using the *AAP - Scenario 3 (Node Selector)* tab. Navigate to *Automation Execution → Templates* and launch the *Break Scenario* job template. Wait for it to complete before proceeding.
+
+=== Step 2: Inspect failing pods
+
+Open the *OpenShift Console* and navigate to *Workloads → Pods*. Filter by your namespace.
+
+Identify pods that are not reaching a `Running` state. Click on each failing pod and review the *Events* tab; the scheduler messages will point you toward the root cause.
+
+=== Step 3: Fix the issue
+
+Once you have identified the issue, apply the fix through the OpenShift Console.
+
+Refer to the solution page if needed: xref:scenario-3-solution.adoc[Solution: Node selector issue]
+
+=== Step 4: Verify
+
+Confirm all pods are running and ready, then successfully log into the AAP UI.
+
+== Hint
+
+There is one issue. Try to identify the issue before checking the solution. Use *Logs* section on the failing pods in the OpenShift Console; the events section may tell you why the scheduler cannot place them.
+
+== Check Your Work
+
+++++
+<div class="validate-button-placeholder" data-module="scenario-3"></div>
+<div class="solve-button-placeholder" data-module="scenario-3"></div>
+++++

@@ -1,0 +1,75 @@
+---
+- name: Validate Module 02 — Gateway Connectivity
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    _token: "{{ lookup('file', '/var/run/secrets/kubernetes.io/serviceaccount/token') }}"
+
+  tasks:
+    - name: Read namespace from service account
+      ansible.builtin.slurp:
+        src: /var/run/secrets/kubernetes.io/serviceaccount/namespace
+      register: r_ns
+
+    - name: Set namespace and CR name facts
+      ansible.builtin.set_fact:
+        current_namespace: "{{ r_ns.content | b64decode | trim }}"
+        aap_cr_name: "{{ r_ns.content | b64decode | trim | regex_replace('-scenario-[0-9]+$', '') }}-aap"
+
+    - name: Check postgres-15 Service exists
+      ansible.builtin.uri:
+        url: "https://kubernetes.default.svc/api/v1/namespaces/{{ current_namespace }}/services/{{ aap_cr_name }}-postgres-15"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ _token }}"
+        validate_certs: false
+        status_code: [200, 404]
+      register: r_postgres_svc
+
+    - name: Check gateway operator deployment
+      ansible.builtin.uri:
+        url: "https://kubernetes.default.svc/apis/apps/v1/namespaces/{{ current_namespace }}/deployments/aap-gateway-operator-controller-manager"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ _token }}"
+        validate_certs: false
+        status_code: [200, 404]
+      register: r_operator_dep
+
+    - name: Check gateway pods
+      ansible.builtin.uri:
+        url: "https://kubernetes.default.svc/api/v1/namespaces/{{ current_namespace }}/pods?labelSelector=app.kubernetes.io%2Fcomponent%3Daap-gateway"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ _token }}"
+        validate_certs: false
+        status_code: [200, 404]
+      register: r_gateway_pods
+
+    - name: Evaluate checks
+      ansible.builtin.set_fact:
+        postgres_svc_exists: "{{ r_postgres_svc.status == 200 }}"
+        operator_running: >-
+          {{
+            r_operator_dep.status == 200 and
+            r_operator_dep.json.spec.replicas | default(0) | int >= 1
+          }}
+        gateway_pods_running: >-
+          {{
+            r_gateway_pods.status == 200 and
+            r_gateway_pods.json['items'] | selectattr('status.phase', 'equalto', 'Running') | list | length > 0
+          }}
+
+    - name: Validate all tasks
+      validation_check:
+        check: "{{ postgres_svc_exists and operator_running and gateway_pods_running }}"
+        pass_msg: |
+          ✅ Service {{ aap_cr_name }}-postgres-15 exists
+          ✅ Gateway operator deployment has replicas >= 1
+          ✅ Gateway pods Running
+        error_msg: |
+          {{ '✅' if postgres_svc_exists else '❌' }} Service {{ aap_cr_name }}-postgres-15 exists
+          {{ '✅' if operator_running else '❌' }} Gateway operator deployment has replicas >= 1
+          {{ '✅' if gateway_pods_running else '❌' }} Gateway pods Running

@@ -1,0 +1,44 @@
+= 💡 Solution: Scenario 4 - ALIA Lightspeed issues
+
+This page provides the detailed solution for the issue presented in Scenario 4, which involves an incorrect Large Language Model (LLM) configuration for Ansible Lightspeed Intelligent Assistant (ALIA).
+
+---
+
+== 🛑 Problem: Invalid Large Language Model (LLM) configuration
+
+=== Diagnosis
+
+The *Ansible Lightspeed Intelligent Assistant (ALIA)* service was unable to initialize because it was configured to use a model that it was not authorized to access (`codellama-7b-instruct`). This prevents the ALIA UI component from being activated.
+
+The pod logs for the `lightspeed-api` and `chatbot` pods confirm the model connection failure.
+
+=== 🛠️ Resolution: Updating the chatbot secret
+
+The configuration for the LLM is stored within the `chatbot-configuration-secret`. The fix is to edit this secret and replace the unauthorized model name with the correct one: `{alia_model}`.
+
+==== 1. Update the chatbot configuration secret
+
+In the *OpenShift Console*, navigate to *Workloads → Secrets* in your namespace. Find `chatbot-configuration-secret`, open it and click *Edit*.
+
+Update the `chatbot_model` value to the correct model name:
+
+[source,yaml,subs="+attributes"]
+----
+data:
+  chatbot_model: {alia_model}  # <--- CORRECT VALUE
+----
+
+[IMPORTANT]
+====
+Make sure you are editing the `chatbot_model` key specifically. If using the *Key/Value* editor, the console handles base64 encoding automatically. If editing raw YAML, the value must be base64-encoded.
+====
+
+==== 2. Force reconciliation
+
+The *Lightspeed Operator* must restart to pick up the changes from the secret.
+
+In the *OpenShift Console*, navigate to *Workloads → Pods* and select your namespace. Find the `ansible-lightspeed-operator-controller-manager...` pod, click the three-dot menu on the right, and select *Delete Pod*. Repeat for the `lightspeed-chatbot-api` and `lightspeed-api` pod. Both will restart automatically and pick up the corrected configuration.
+
+==== 3. Verification
+
+Monitor *Workloads → Pods* until the Lightspeed pods are running and ready. Then log back into the AAP UI; the ALIA chat icon should reappear in the top navigation bar and respond to a test query.

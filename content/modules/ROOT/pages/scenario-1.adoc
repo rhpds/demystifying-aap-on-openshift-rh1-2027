@@ -1,0 +1,82 @@
+= Scenario 1: Automation Hub storage issue
+
+[cols="3",options="header"]
+|===
+| Difficulty | Components | Break Type
+| Easy | Automation Hub | Storage configuration
+|===
+
+== Objectives
+
+* Verify the health of the *Automation Hub* pods.
+* Diagnose and resolve a storage-related failure preventing Hub from starting.
+* Understand why Automation Hub requires a ReadWriteMany (RWX) storage class.
+
+[IMPORTANT]
+====
+Use the *AAP - Scenario 1 (Hub)* tab in the right-hand panel for this scenario.
+====
+
+[NOTE]
+====
+*Scenario 1 is different from the others.* The environment is already broken at deployment. There is no *Break Scenario* job template to run. Log into AAP and go straight to troubleshooting.
+====
+
+[#credentials]
+== Your credentials
+
+Use the following credentials to log into AAP via the tab on the right:
+
+[cols="1,2",options="header"]
+|===
+| Field | Value
+| *Username* | admin
+| *Password* | {password}
+|===
+
+[#ocp-console]
+== OpenShift Console
+
+Use the following credentials to log into OpenShift via the tab on the right:
+
+[cols="1,2",options="header"]
+|===
+| Field | Value
+| *Username* | {user}
+| *Password* | {password}
+|===
+
+== Troubleshooting
+
+=== Step 1: Inspect Hub pods
+
+Open the *OpenShift Console* and navigate to *Workloads → Pods*. Filter by your namespace.
+
+Look for Hub-related pods stuck in a `Pending` state.
+
+=== Step 2: Investigate the failure reason
+
+Click on a failing Hub pod and review the *Events* tab. The error message will indicate why the pod cannot be scheduled.
+
+Navigate to *Storage → PersistentVolumeClaims* and inspect the status of the Hub PVC to confirm your diagnosis.
+
+=== Step 3: Fix the issue
+
+Once you have identified the root cause, apply the fix through the OpenShift Console.
+
+Refer to the solution page if you need guidance: xref:scenario-1-solution.adoc[Solution: Automation Hub storage issue]
+
+=== Step 4: Verify
+
+Monitor the namespace until all Hub pods transition to a `Running` and `Ready` state.
+
+== Hint
+
+The failure is related to how Automation Hub uses storage. Review the pod events to understand what the scheduler is reporting, then look at the storage access mode requirements for Automation Hub.
+
+== Check Your Work
+
+++++
+<div class="validate-button-placeholder" data-module="scenario-1"></div>
+<div class="solve-button-placeholder" data-module="scenario-1"></div>
+++++
