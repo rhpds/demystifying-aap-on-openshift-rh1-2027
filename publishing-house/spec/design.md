@@ -115,16 +115,18 @@ The provisioning automation must:
 
 ## Infrastructure Requirements
 
-- **Cloud provider:** TBD — confirmed in infrastructure phase
-- **Cluster type:** TBD — confirmed in infrastructure phase
-- **OCP version:** TBD — confirmed in infrastructure phase
-- **Topology:** TBD — confirmed in infrastructure phase
-- **Sizing:** TBD — confirmed in infrastructure phase
-- **Automation approach:** TBD — confirmed in infrastructure phase
-- **AI/MaaS:** TBD — confirmed in infrastructure phase
-- **External services:** TBD — confirmed in infrastructure phase
-- **AAP version:** TBD — confirmed in infrastructure phase
-- **Non-GA products:** TBD — confirmed in infrastructure phase
+- **Cloud provider:** CNV
+- **Cluster type:** Multinode OCP (shared cluster)
+- **OCP version:** 4.20 minimum
+- **Topology:** Shared-cluster, 60 max concurrent users
+- **Sizing:** TBD — infra reviewer to size for 60 simultaneous students, each with 6 AAP
+  Operator deployments (Hub, Gateway, Controller, Lightspeed) in their own namespace plus
+  ODF-backed CephFS PVCs
+- **Automation approach:** Both (Ansible + GitOps)
+- **AI/MaaS:** MaaS, open-source model (external LLM endpoint for ALIA/Lightspeed in Scenario 6)
+- **External services:** MaaS LLM endpoint (provisioned and used during student session for Scenario 6)
+- **AAP version:** 2.7
+- **Non-GA products:** None (all products are GA)
 
 ## Assessment Strategy
 
