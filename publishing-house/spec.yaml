@@ -16,8 +16,8 @@ project:
   automation_type: "both"
   description: "Hands on lab providing attendees with functioning AAP clusters, letting them break the cluster, then providing them with the troubleshooting steps to recover."
   # content_reviewer_email and infra_reviewer_email are assigned by the RHDP team — not set by the author
-  jira_ticket: ""
-  workflow_id: ""
+  jira_ticket: "RHDPCD-1053"
+  workflow_id: "9860cd34-65ac-4f18-af7d-2976e0e69850"
 
 spec:
   title: ""

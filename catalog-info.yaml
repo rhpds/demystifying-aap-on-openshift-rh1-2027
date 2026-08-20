@@ -3,9 +3,9 @@ kind: Component
 metadata:
   name: demystifying-aap-on-openshift-rh1-2027
   title: demystifying-aap-on-openshift-rh1-2027
-  description: Hands on lab providing attendees with functioning AAP clusters,
-    letting them break the cluster, then providing them with the troubleshooting
-    steps to recover.
+  description: Hands on lab providing attendees with functioning AAP clusters, letting
+    them break the cluster, then providing them with the troubleshooting steps to
+    recover.
   annotations:
     ph.rhdp.io/content-type: lab
     ph.rhdp.io/deployment-mode: rhdp_published
@@ -14,22 +14,25 @@ metadata:
     ph.rhdp.io/migrated-repo: https://github.com/rhpds/demystifying-aap-on-ocp-showroom.git
     backstage.io/techdocs-ref: dir:.
     github.com/project-slug: rhpds/demystifying-aap-on-openshift-rh1-2027
-    ph.rhdp.io/created-at: 2026-08-17T20:43:08.348Z
+    ph.rhdp.io/created-at: 2026-08-17 20:43:08.348000+00:00
   tags:
-    - publishing-house
-    - lab
-    - rhdp-published
-    - migration
+  - publishing-house
+  - lab
+  - rhdp-published
+  - migration
   links:
-    - url: https://github.com/rhpds/demystifying-aap-on-openshift-rh1-2027
-      title: Repository
-      icon: github
-    - url: https://devspaces.apps.ocpv-infra02.wdc07.infra.demo.redhat.com#https://github.com/rhpds/demystifying-aap-on-openshift-rh1-2027
-      title: Open in DevSpaces
-      icon: catalog
-    - url: https://central-api-publishing-house.apps.ocpv-infra02.wdc07.infra.demo.redhat.com
-      title: Central
-      icon: dashboard
+  - url: https://github.com/rhpds/demystifying-aap-on-openshift-rh1-2027
+    title: Repository
+    icon: github
+  - url: https://devspaces.apps.ocpv-infra02.wdc07.infra.demo.redhat.com#https://github.com/rhpds/demystifying-aap-on-openshift-rh1-2027
+    title: Open in DevSpaces
+    icon: catalog
+  - url: https://central-api-publishing-house.apps.ocpv-infra02.wdc07.infra.demo.redhat.com
+    title: Central
+    icon: dashboard
+  - url: https://redhat.atlassian.net/browse/RHDPCD-1053
+    title: Jira Epic
+    icon: dashboard
 spec:
   type: content
   lifecycle: experimental
