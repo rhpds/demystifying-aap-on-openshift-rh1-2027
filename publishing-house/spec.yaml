@@ -20,9 +20,47 @@ project:
   workflow_id: "9860cd34-65ac-4f18-af7d-2976e0e69850"
 
 spec:
-  title: ""
-  learning_objectives: []
-  modules: []              # [{id, title, duration_min}] — written by intake Phase 4; id is stable (e.g. module-01)
+  title: "Demystifying Ansible Automation Platform on OpenShift Container Platform"
+  learning_objectives:
+    - "Troubleshoot Automation Hub pod scheduling and resource failures by correcting the StorageClass, PVC access mode, memory limits, and PVC capacity in the AAP Custom Resource."
+    - "Restore Automation Gateway authentication by diagnosing pod log output to identify credential mismatches and resetting the admin password using in-cluster management tooling."
+    - "Diagnose and resolve Kubernetes pod scheduling failures caused by an invalid node selector in the AAP Custom Resource database configuration."
+    - "Verify Execution Environment job template configurations and resolve private registry authentication failures by updating the Execution Environment assignment on failing templates."
+    - "Troubleshoot Ansible Lightspeed (ALIA) service failures by inspecting pod logs and Kubernetes Secrets to identify unauthorized LLM model configurations and restore connectivity to an external LLM endpoint."
+  modules:
+    - id: module-01
+      title: "Welcome and Lab Credentials"
+      duration_min: 10
+      status: not_started
+    - id: module-02
+      title: "Scenario 1: Automation Hub Storage Issue"
+      duration_min: 20
+      status: not_started
+    - id: module-03
+      title: "Scenario 2: Gateway and Controller Login Issues"
+      duration_min: 25
+      status: not_started
+    - id: module-04
+      title: "Scenario 3: Node Selector and Resource Issues"
+      duration_min: 20
+      status: not_started
+    - id: module-05
+      title: "Scenario 4: Execution Environment Credentials"
+      duration_min: 20
+      status: not_started
+    - id: module-06
+      title: "Scenario 5: Automation Hub Sync Issues"
+      duration_min: 25
+      status: not_started
+    - id: module-07
+      title: "Scenario 6: ALIA Lightspeed Issues"
+      duration_min: 30
+      status: not_started
+    - id: module-08
+      title: "Conclusion"
+      duration_min: 5
+      status: not_started
+  # [{id, title, duration_min}] — written by intake Phase 4; id is stable (e.g. module-01)
   environment:
     platform: ""               # ocp | rhel-vms — determines which sizing fields apply
     topology: ""               # shared-cluster | per-student | cnv-pool
@@ -55,8 +93,8 @@ spec:
     external_services: []              # named external service dependencies e.g. [github.com]
     gpu_nodes: 0                       # number of GPU nodes (0 = none)
     gpu_type: ""                       # e.g. NVIDIA A100 40GB (required if gpu_nodes > 0)
-  duration_hours: null
-  audience: ""               # beginner | intermediate | advanced
+  duration_hours: 2.5
+  audience: "intermediate"   # beginner | intermediate | advanced
 
 development:
   automation:
@@ -81,7 +119,7 @@ tracking:
 approval_checklist:
 
   content:
-    prerequisites_verifiable: null
+    prerequisites_verifiable: false
     assessment_strategy: ""
     catalog_gap: ""
     design_overview: ""
