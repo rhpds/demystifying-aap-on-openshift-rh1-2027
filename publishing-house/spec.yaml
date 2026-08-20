@@ -120,12 +120,43 @@ approval_checklist:
 
   content:
     prerequisites_verifiable: false
-    assessment_strategy: ""
-    catalog_gap: ""
-    design_overview: ""
-    module_summaries: []
-    rcars_overlap_pct: null
-    rcars_top_matches: []
+    assessment_strategy: "Zero-Touch lab with automated Solve and Validate buttons on all six scenario modules. Validate confirms environment recovery; pass on all six constitutes completion."
+    catalog_gap: "No existing catalog item covers AAP Operator operational troubleshooting on OpenShift. The existing catalog entry for this lab ran 4 scenarios at 90 min; this migration expands to 6 full scenarios (~2.5 hours) and enters the Publishing House lifecycle."
+    design_overview: "A hands-on troubleshooting lab where AAP administrators and platform engineers diagnose and recover six pre-broken Ansible Automation Platform deployments running on OpenShift. Each scenario targets a distinct failure class: Hub storage access mode, Gateway authentication, node selector misconfiguration, Execution Environment credentials, Hub sync resource constraints, and Ansible Lightspeed LLM configuration."
+    module_summaries:
+      - title: "Welcome and Lab Credentials"
+        overview: "Orientation module explaining the break-and-fix lab structure, student namespace layout, and credential access for all six AAP instances and the OpenShift Console."
+      - title: "Scenario 1: Automation Hub Storage Issue"
+        overview: "Students diagnose Automation Hub pods stuck Pending due to a ReadWriteOnly StorageClass and fix it by updating the AAP CR to use a CephFS RWX StorageClass."
+      - title: "Scenario 2: Gateway and Controller Login Issues"
+        overview: "Students trace an AAP Gateway login failure to an incorrect admin password, then reset it using the aap-gateway-manage utility inside the Gateway pod terminal."
+      - title: "Scenario 3: Node Selector and Resource Issues"
+        overview: "Students identify an invalid nodeSelector on the AAP CR database configuration that prevents PostgreSQL pods from scheduling, then correct or remove the selector to restore the deployment."
+      - title: "Scenario 4: Execution Environment Credentials"
+        overview: "Students identify a job template using an EE image from a private registry without a matching credential, and fix it by switching the EE to a publicly accessible alternative."
+      - title: "Scenario 5: Automation Hub Sync Issues"
+        overview: "Students resolve two compounding Hub sync failures: OOMKilled content worker pods (fixed by increasing memory limits in the AAP CR) and an undersized PVC (fixed by expanding storage in both the CR and the existing PVC)."
+      - title: "Scenario 6: ALIA Lightspeed Issues"
+        overview: "Students trace a missing ALIA chat icon to an unauthorized LLM model configured in the chatbot secret, then restore the correct model and force reconciliation by restarting the Lightspeed operator and API pods."
+      - title: "Conclusion"
+        overview: "Wrap-up summarizing the six scenarios and skills practiced, with links to AAP and OCP documentation."
+    rcars_overlap_pct: 44
+    rcars_top_matches:
+      - title: "Operations and Automation with OpenShift Virtualization"
+        ci_name: "openshift-cnv.virt-aap-day-2.prod"
+        url: "https://catalog.demo.redhat.com/catalog?item=openshift-cnv.virt-aap-day-2.prod"
+        relevance_score: 44
+        why_it_fits: "Covers both AAP and OCP together at an intermediate level, but focus is VM lifecycle automation not AAP Operator troubleshooting."
+      - title: "Experience OpenShift Virtualization: Advanced Operations and Automation"
+        ci_name: "openshift-cnv.ocp-virt-advanced-ops.prod"
+        url: "https://catalog.demo.redhat.com/catalog?item=openshift-cnv.ocp-virt-advanced-ops.prod"
+        relevance_score: 41
+        why_it_fits: "AAP + OCP pairing at intermediate level; AAP content is narrowly VM automation with no overlap on Hub/Gateway/Lightspeed troubleshooting."
+      - title: "Experience OpenShift Virtualization: Advanced Operations and Automation - Shared RHACM HUB"
+        ci_name: "openshift-cnv.ocp-virt-advanced-ops-hub.prod"
+        url: "https://catalog.demo.redhat.com/catalog?item=openshift-cnv.ocp-virt-advanced-ops-hub.prod"
+        relevance_score: 39
+        why_it_fits: "OpenShift and AAP together, but AAP content focused on VM lifecycle automation rather than Operator component failure diagnosis."
     rejections: []
 
   infra:
