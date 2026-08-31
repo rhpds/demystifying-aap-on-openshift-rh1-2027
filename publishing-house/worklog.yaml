@@ -2,4 +2,17 @@
 # Human context, decisions, and notes that bridge sessions and people.
 # Not a task tracker — the manifest tracks structured progress.
 
-entries: []
+entries:
+  - id: "2026-08-31-001"
+    timestamp: "2026-08-31T00:00:00Z"
+    author: "rl-rh"
+    status: open
+    type: note
+    content: >
+      Two bonus scenarios are fully developed and available but were cut from the required
+      path to keep the core lab within ~90 minutes (the observed completion time for the
+      four core scenarios). Scenario 5 — Execution Environment Credentials (~20 min) and
+      Scenario 6 — Automation Hub Sync Issues (~25 min) — should be revisited during the
+      development phase as optional content. When added, they would be clearly marked
+      optional in the Showroom UI and excluded from the Validate completion gate, so
+      attendees who finish early can continue but no one is gated on them.
