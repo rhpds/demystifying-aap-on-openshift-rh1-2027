@@ -35,18 +35,15 @@ targeted fixes and validate recovery.
 
 ## Learning Objectives
 
-1. Troubleshoot Automation Hub pod scheduling and resource failures by
-   correcting the StorageClass, PVC access mode, memory limits, and PVC
-   capacity in the AAP Custom Resource.
+1. Troubleshoot Automation Hub pod scheduling failures by identifying an
+   incompatible StorageClass and correcting the PVC access mode in the AAP
+   Custom Resource.
 2. Restore Automation Gateway authentication by diagnosing pod log output to
    identify credential mismatches and resetting the admin password using
    in-cluster management tooling.
 3. Diagnose and resolve Kubernetes pod scheduling failures caused by an invalid
    node selector in the AAP Custom Resource database configuration.
-4. Verify Execution Environment job template configurations and resolve private
-   registry authentication failures by updating the Execution Environment
-   assignment on failing templates.
-5. Troubleshoot Ansible Lightspeed (ALIA) service failures by inspecting pod
+4. Troubleshoot Ansible Lightspeed (ALIA) service failures by inspecting pod
    logs and Kubernetes Secrets to identify unauthorized LLM model
    configurations and restore connectivity to an external LLM endpoint.
 
@@ -72,13 +69,11 @@ Lab (hands-on)
 | 2 | Scenario 1: Automation Hub Storage Issue | 20 min |
 | 3 | Scenario 2: Gateway and Controller Login Issues | 25 min |
 | 4 | Scenario 3: Node Selector and Resource Issues | 20 min |
-| 5 | Scenario 4: Execution Environment Credentials | 20 min |
-| 6 | Scenario 5: Automation Hub Sync Issues | 25 min |
-| 7 | Scenario 6: ALIA Lightspeed Issues | 30 min |
-| 8 | Conclusion | 5 min |
-| — | **Total hands-on** | **~155 min (~2.5 hours)** |
+| 5 | Scenario 4: ALIA — Ansible Lightspeed Issues | 30 min |
+| 6 | Conclusion | 5 min |
+| — | **Total** | **~110 min (~1.75 hours)** |
 
-Each scenario module (2–7) has a companion solution reference sub-page; these
+Each scenario module (2–5) has a companion solution reference sub-page; these
 are not separately timed in the map.
 
 ## Difficulty Level
@@ -89,10 +84,10 @@ Intermediate
 
 **Learner view:** When the lab starts, participants land in a pre-provisioned
 shared OpenShift cluster with a dedicated namespace already created for them.
-The namespace contains six independently deployed AAP instances — one per
+The namespace contains four independently deployed AAP instances — one per
 scenario — each pre-broken by the provisioning automation. The Showroom sidebar
 provides direct links to the OpenShift Console and to each scenario's AAP UI.
-Scenario modules include a Run Break Scenario button (Scenarios 2–6) that
+Scenario modules include a Run Break Scenario button (Scenarios 2–4) that
 triggers the break job for that instance, followed by investigation and fix
 steps, and a Validate button to confirm recovery. No cluster-admin access is
 required; all work is scoped to the student namespace and performed through the
@@ -103,14 +98,14 @@ command in Scenario 2).
 
 The provisioning automation must:
 - Create one namespace per student on the shared OCP cluster
-- Deploy six AAP Operator instances in each namespace (one per scenario),
+- Deploy four AAP Operator instances in each namespace (one per scenario),
   including Automation Hub, Automation Gateway, Automation Controller, and
   Lightspeed Operator
 - Provision ODF-backed CephFS PVCs for Automation Hub instances
 - Pre-configure each AAP instance for its scenario (valid baseline state)
 - Expose each scenario's AAP UI route and configure Showroom tab links
 - Configure the external MaaS LLM endpoint and ALIA chatbot credentials for
-  Scenario 6
+  Scenario 4
 - Provide Break Scenario and Validate job templates within each AAP instance
 
 ## Infrastructure Requirements
@@ -130,7 +125,7 @@ The provisioning automation must:
 
 ## Assessment Strategy
 
-This is a Zero-Touch lab. Each of the six scenario modules (Scenarios 1–6)
+This is a Zero-Touch lab. Each of the four scenario modules (Scenarios 1–4)
 includes automated solve and validate buttons:
 
 - **Solve** applies the correct fix to the broken AAP instance for participants
@@ -138,5 +133,5 @@ includes automated solve and validate buttons:
 - **Validate** runs an automated check confirming the environment has been
   restored to a working state and returns a pass/fail result in the Showroom UI.
 
-Successful validation on all six scenario modules constitutes completion of the
+Successful validation on all four scenario modules constitutes completion of the
 lab. The Welcome and Conclusion modules do not have validation gates.

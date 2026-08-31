@@ -15,17 +15,13 @@ project:
 spec:
   title: Demystifying Ansible Automation Platform on OpenShift Container Platform
   learning_objectives:
-  - Troubleshoot Automation Hub pod scheduling and resource failures by correcting
-    the StorageClass, PVC access mode, memory limits, and PVC capacity in the AAP
-    Custom Resource.
+  - Troubleshoot Automation Hub pod scheduling failures by identifying an incompatible
+    StorageClass and correcting the PVC access mode in the AAP Custom Resource.
   - Restore Automation Gateway authentication by diagnosing pod log output to identify
     credential mismatches and resetting the admin password using in-cluster management
     tooling.
   - Diagnose and resolve Kubernetes pod scheduling failures caused by an invalid node
     selector in the AAP Custom Resource database configuration.
-  - Verify Execution Environment job template configurations and resolve private registry
-    authentication failures by updating the Execution Environment assignment on failing
-    templates.
   - Troubleshoot Ansible Lightspeed (ALIA) service failures by inspecting pod logs
     and Kubernetes Secrets to identify unauthorized LLM model configurations and restore
     connectivity to an external LLM endpoint.
@@ -47,18 +43,10 @@ spec:
     duration_min: 20
     status: not_started
   - id: module-05
-    title: 'Scenario 4: Execution Environment Credentials'
-    duration_min: 20
-    status: not_started
-  - id: module-06
-    title: 'Scenario 5: Automation Hub Sync Issues'
-    duration_min: 25
-    status: not_started
-  - id: module-07
-    title: 'Scenario 6: ALIA Lightspeed Issues'
+    title: 'Scenario 4: ALIA — Ansible Lightspeed Issues'
     duration_min: 30
     status: not_started
-  - id: module-08
+  - id: module-06
     title: Conclusion
     duration_min: 5
     status: not_started
@@ -88,7 +76,7 @@ spec:
     - MaaS LLM endpoint (ALIA/Lightspeed, Scenario 6)
     gpu_nodes: 0
     gpu_type: ''
-  duration_hours: 2.5
+  duration_hours: 1.75
   audience: intermediate
 development:
   automation:
@@ -110,18 +98,17 @@ approval_checklist:
   content:
     prerequisites_verifiable: false
     assessment_strategy: Zero-Touch lab with automated Solve and Validate buttons
-      on all six scenario modules. Validate confirms environment recovery; pass on
-      all six constitutes completion.
+      on all four scenario modules. Validate confirms environment recovery; pass on
+      all four constitutes completion.
     catalog_gap: No existing catalog item covers AAP Operator operational troubleshooting
       on OpenShift. The existing catalog entry for this lab ran 4 scenarios at 90
       min; this migration expands to 6 full scenarios (~2.5 hours) and enters the
       Publishing House lifecycle.
     design_overview: 'A hands-on troubleshooting lab where AAP administrators and
-      platform engineers diagnose and recover six pre-broken Ansible Automation Platform
+      platform engineers diagnose and recover four pre-broken Ansible Automation Platform
       deployments running on OpenShift. Each scenario targets a distinct failure class:
       Hub storage access mode, Gateway authentication, node selector misconfiguration,
-      Execution Environment credentials, Hub sync resource constraints, and Ansible
-      Lightspeed LLM configuration.'
+      and Ansible Lightspeed LLM configuration.'
     module_summaries:
     - title: Welcome and Lab Credentials
       overview: Orientation module explaining the break-and-fix lab structure, student
@@ -138,15 +125,7 @@ approval_checklist:
       overview: Students identify an invalid nodeSelector on the AAP CR database configuration
         that prevents PostgreSQL pods from scheduling, then correct or remove the
         selector to restore the deployment.
-    - title: 'Scenario 4: Execution Environment Credentials'
-      overview: Students identify a job template using an EE image from a private
-        registry without a matching credential, and fix it by switching the EE to
-        a publicly accessible alternative.
-    - title: 'Scenario 5: Automation Hub Sync Issues'
-      overview: 'Students resolve two compounding Hub sync failures: OOMKilled content
-        worker pods (fixed by increasing memory limits in the AAP CR) and an undersized
-        PVC (fixed by expanding storage in both the CR and the existing PVC).'
-    - title: 'Scenario 6: ALIA Lightspeed Issues'
+    - title: 'Scenario 4: ALIA — Ansible Lightspeed Issues'
       overview: Students trace a missing ALIA chat icon to an unauthorized LLM model
         configured in the chatbot secret, then restore the correct model and force
         reconciliation by restarting the Lightspeed operator and API pods.

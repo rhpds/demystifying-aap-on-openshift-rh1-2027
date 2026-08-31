@@ -1,6 +1,6 @@
 ## Brief Overview
 
-Scenario 6 is the lab's second hard-difficulty scenario and covers ALIA — the Ansible Lightspeed AI assistant integrated into the AAP UI. After running the Break Scenario job template, the ALIA chat icon disappears from the AAP Gateway UI because the Lightspeed component has been configured with an unauthorized model (`codellama-7b-instruct`) that the external MaaS LLM endpoint rejects. Students inspect Lightspeed API pod logs and chatbot pod logs through the OpenShift Console, decode the `chatbot-configuration-secret`, identify the incorrect model value, patch the secret, and force reconciliation. This scenario teaches how AAP Lightspeed reads its LLM configuration from Kubernetes Secrets and how to recover from a misconfigured AI backend.
+Scenario 4 is the lab's second hard-difficulty scenario and covers ALIA — the Ansible Lightspeed AI assistant integrated into the AAP UI. After running the Break Scenario job template, the ALIA chat icon disappears from the AAP Gateway UI because the Lightspeed component has been configured with an unauthorized model (`codellama-7b-instruct`) that the external MaaS LLM endpoint rejects. Students inspect Lightspeed API pod logs and chatbot pod logs through the OpenShift Console, decode the `chatbot-configuration-secret`, identify the incorrect model value, patch the secret, and force reconciliation. This scenario teaches how AAP Lightspeed reads its LLM configuration from Kubernetes Secrets and how to recover from a misconfigured AI backend.
 
 ## Audience and Time
 
@@ -29,7 +29,7 @@ Scenario 6 is the lab's second hard-difficulty scenario and covers ALIA — the 
 
 ## Detailed Steps
 
-1. Open the Scenario 6 Showroom tab; navigate to AAP Controller and run the Break Scenario job template
+1. Open the Scenario 4 Showroom tab; navigate to AAP Controller and run the Break Scenario job template
 2. Open the AAP Gateway UI and confirm the ALIA chat icon is no longer visible in the navigation bar
 3. Switch to the OpenShift Console; navigate to Workloads → Pods; filter by the scenario namespace
 4. Find the `lightspeed-api-*` pod; open the Logs tab and look for errors related to the LLM endpoint (unauthorized model or 403 responses from the MaaS API)
