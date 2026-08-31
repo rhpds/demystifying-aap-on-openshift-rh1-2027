@@ -1,102 +1,95 @@
-# Publishing House — Project Spec
-# Lifecycle: intake → content_review → infra_review → jira_sync → development → ready → published
-# No secrets in this file. Tokens live in ~/.config/publishing-house/auth.json
-# Stage is managed by SonataFlow and cached in .ph-state — do not edit stage.current manually.
-# NOTE: This file is also in the template repo. The Scaffolder overlays project.* values.
-# TODO: Eliminate this copy — Scaffolder should pull from template repo directly.
-
 project:
-  slug: "demystifying-aap-on-openshift-rh1-2027"
-  owner_email: "rlaroy@redhat.com"
-  content_type: "lab"
-  deployment_mode: "rhdp_published"
-  initiative_key: "rh1_2027"
-  showroom_type: "zero_touch"
-  intake_type: "migration"
-  automation_type: "both"
-  description: "Hands on lab providing attendees with functioning AAP clusters, letting them break the cluster, then providing them with the troubleshooting steps to recover."
-  # content_reviewer_email and infra_reviewer_email are assigned by the RHDP team — not set by the author
-  jira_ticket: "RHDPCD-1053"
-  workflow_id: "9860cd34-65ac-4f18-af7d-2976e0e69850"
-
+  slug: demystifying-aap-on-openshift-rh1-2027
+  owner_email: rlaroy@redhat.com
+  content_type: lab
+  deployment_mode: rhdp_published
+  initiative_key: rh1_2027
+  showroom_type: zero_touch
+  intake_type: migration
+  automation_type: both
+  description: Hands on lab providing attendees with functioning AAP clusters, letting
+    them break the cluster, then providing them with the troubleshooting steps to
+    recover.
+  jira_ticket: RHDPCD-1053
+  workflow_id: 9860cd34-65ac-4f18-af7d-2976e0e69850
 spec:
-  title: "Demystifying Ansible Automation Platform on OpenShift Container Platform"
+  title: Demystifying Ansible Automation Platform on OpenShift Container Platform
   learning_objectives:
-    - "Troubleshoot Automation Hub pod scheduling and resource failures by correcting the StorageClass, PVC access mode, memory limits, and PVC capacity in the AAP Custom Resource."
-    - "Restore Automation Gateway authentication by diagnosing pod log output to identify credential mismatches and resetting the admin password using in-cluster management tooling."
-    - "Diagnose and resolve Kubernetes pod scheduling failures caused by an invalid node selector in the AAP Custom Resource database configuration."
-    - "Verify Execution Environment job template configurations and resolve private registry authentication failures by updating the Execution Environment assignment on failing templates."
-    - "Troubleshoot Ansible Lightspeed (ALIA) service failures by inspecting pod logs and Kubernetes Secrets to identify unauthorized LLM model configurations and restore connectivity to an external LLM endpoint."
+  - Troubleshoot Automation Hub pod scheduling and resource failures by correcting
+    the StorageClass, PVC access mode, memory limits, and PVC capacity in the AAP
+    Custom Resource.
+  - Restore Automation Gateway authentication by diagnosing pod log output to identify
+    credential mismatches and resetting the admin password using in-cluster management
+    tooling.
+  - Diagnose and resolve Kubernetes pod scheduling failures caused by an invalid node
+    selector in the AAP Custom Resource database configuration.
+  - Verify Execution Environment job template configurations and resolve private registry
+    authentication failures by updating the Execution Environment assignment on failing
+    templates.
+  - Troubleshoot Ansible Lightspeed (ALIA) service failures by inspecting pod logs
+    and Kubernetes Secrets to identify unauthorized LLM model configurations and restore
+    connectivity to an external LLM endpoint.
   modules:
-    - id: module-01
-      title: "Welcome and Lab Credentials"
-      duration_min: 10
-      status: not_started
-    - id: module-02
-      title: "Scenario 1: Automation Hub Storage Issue"
-      duration_min: 20
-      status: not_started
-    - id: module-03
-      title: "Scenario 2: Gateway and Controller Login Issues"
-      duration_min: 25
-      status: not_started
-    - id: module-04
-      title: "Scenario 3: Node Selector and Resource Issues"
-      duration_min: 20
-      status: not_started
-    - id: module-05
-      title: "Scenario 4: Execution Environment Credentials"
-      duration_min: 20
-      status: not_started
-    - id: module-06
-      title: "Scenario 5: Automation Hub Sync Issues"
-      duration_min: 25
-      status: not_started
-    - id: module-07
-      title: "Scenario 6: ALIA Lightspeed Issues"
-      duration_min: 30
-      status: not_started
-    - id: module-08
-      title: "Conclusion"
-      duration_min: 5
-      status: not_started
-  # [{id, title, duration_min}] — written by intake Phase 4; id is stable (e.g. module-01)
+  - id: module-01
+    title: Welcome and Lab Credentials
+    duration_min: 10
+    status: not_started
+  - id: module-02
+    title: 'Scenario 1: Automation Hub Storage Issue'
+    duration_min: 20
+    status: not_started
+  - id: module-03
+    title: 'Scenario 2: Gateway and Controller Login Issues'
+    duration_min: 25
+    status: not_started
+  - id: module-04
+    title: 'Scenario 3: Node Selector and Resource Issues'
+    duration_min: 20
+    status: not_started
+  - id: module-05
+    title: 'Scenario 4: Execution Environment Credentials'
+    duration_min: 20
+    status: not_started
+  - id: module-06
+    title: 'Scenario 5: Automation Hub Sync Issues'
+    duration_min: 25
+    status: not_started
+  - id: module-07
+    title: 'Scenario 6: ALIA Lightspeed Issues'
+    duration_min: 30
+    status: not_started
+  - id: module-08
+    title: Conclusion
+    duration_min: 5
+    status: not_started
   environment:
-    platform: "ocp"            # ocp | rhel-vms — determines which sizing fields apply
-    topology: "shared-cluster" # shared-cluster | per-student | cnv-pool
-    cloud_provider: cnv        # cnv | aws | troshka — cnv is default
-    max_concurrent_users: 60   # required if topology = shared-cluster
-
-    # --- OCP-specific fields (only when platform = ocp) ---
-    ocp_version: "4.20"                # e.g. 4.20 — minimum 4.20; leave empty for rhel-vms
-    cluster_type: "multinode"          # sno | multinode — only for platform = ocp
-    control_plane_instance_count: 3    # 1 if sno, 3 if multinode
-    control_plane_cpu: null            # TBD — infra reviewer to size for 60 students × 6 AAP deployments
-    control_plane_ram_gb: null         # TBD — infra reviewer to size
-    worker_count: null                 # TBD — infra reviewer to size
-    worker_cpu: null                   # TBD — infra reviewer to size
-    worker_ram_gb: null                # TBD — infra reviewer to size
-    worker_disk_gb: null               # TBD — infra reviewer to size
-
-    # --- VM-specific fields (only when platform = rhel-vms) ---
-    # Each entry: {role, count, cpu, ram_gb, disk_gb, os}
+    platform: ocp
+    topology: shared-cluster
+    cloud_provider: cnv
+    max_concurrent_users: 60
+    ocp_version: '4.20'
+    cluster_type: multinode
+    control_plane_instance_count: 3
+    control_plane_cpu: null
+    control_plane_ram_gb: null
+    worker_count: null
+    worker_cpu: null
+    worker_ram_gb: null
+    worker_disk_gb: null
     vms_per_student: []
-
-    # --- Common fields (both platforms) ---
-    aap_version: "2.7"                 # required if AAP in products
-    ai_requirement: "maas"             # maas | gpu | none
-    ai_model_tier: "open-source"       # open-source | frontier (if ai_requirement = maas or gpu)
-    ai_model_name: ""                  # specific model e.g. granite-3.1-8b
-    ai_justification: ""               # required if ai_model_tier = frontier or ai_requirement = gpu
-    non_ga_products: []                # list of non-GA products/versions
-    non_ga_access_plan: ""             # how access is provided for non-GA products
+    aap_version: '2.7'
+    ai_requirement: maas
+    ai_model_tier: open-source
+    ai_model_name: ''
+    ai_justification: ''
+    non_ga_products: []
+    non_ga_access_plan: ''
     external_services:
-      - "MaaS LLM endpoint (ALIA/Lightspeed, Scenario 6)"
-    gpu_nodes: 0                       # number of GPU nodes (0 = none)
-    gpu_type: ""                       # e.g. NVIDIA A100 40GB (required if gpu_nodes > 0)
+    - MaaS LLM endpoint (ALIA/Lightspeed, Scenario 6)
+    gpu_nodes: 0
+    gpu_type: ''
   duration_hours: 2.5
-  audience: "intermediate"   # beginner | intermediate | advanced
-
+  audience: intermediate
 development:
   automation:
     gitops:
@@ -107,63 +100,103 @@ development:
     status: not_started
   healthCheck:
     status: not_started
-
 compliance:
   last_hard_check: null
   hard_result: null
-
 tracking:
   paused: false
   pause_reason: null
-
-# Approval checklist — filled collaboratively by author + skill + system + reviewers
 approval_checklist:
-
   content:
     prerequisites_verifiable: false
-    assessment_strategy: "Zero-Touch lab with automated Solve and Validate buttons on all six scenario modules. Validate confirms environment recovery; pass on all six constitutes completion."
-    catalog_gap: "No existing catalog item covers AAP Operator operational troubleshooting on OpenShift. The existing catalog entry for this lab ran 4 scenarios at 90 min; this migration expands to 6 full scenarios (~2.5 hours) and enters the Publishing House lifecycle."
-    design_overview: "A hands-on troubleshooting lab where AAP administrators and platform engineers diagnose and recover six pre-broken Ansible Automation Platform deployments running on OpenShift. Each scenario targets a distinct failure class: Hub storage access mode, Gateway authentication, node selector misconfiguration, Execution Environment credentials, Hub sync resource constraints, and Ansible Lightspeed LLM configuration."
+    assessment_strategy: Zero-Touch lab with automated Solve and Validate buttons
+      on all six scenario modules. Validate confirms environment recovery; pass on
+      all six constitutes completion.
+    catalog_gap: No existing catalog item covers AAP Operator operational troubleshooting
+      on OpenShift. The existing catalog entry for this lab ran 4 scenarios at 90
+      min; this migration expands to 6 full scenarios (~2.5 hours) and enters the
+      Publishing House lifecycle.
+    design_overview: 'A hands-on troubleshooting lab where AAP administrators and
+      platform engineers diagnose and recover six pre-broken Ansible Automation Platform
+      deployments running on OpenShift. Each scenario targets a distinct failure class:
+      Hub storage access mode, Gateway authentication, node selector misconfiguration,
+      Execution Environment credentials, Hub sync resource constraints, and Ansible
+      Lightspeed LLM configuration.'
     module_summaries:
-      - title: "Welcome and Lab Credentials"
-        overview: "Orientation module explaining the break-and-fix lab structure, student namespace layout, and credential access for all six AAP instances and the OpenShift Console."
-      - title: "Scenario 1: Automation Hub Storage Issue"
-        overview: "Students diagnose Automation Hub pods stuck Pending due to a ReadWriteOnly StorageClass and fix it by updating the AAP CR to use a CephFS RWX StorageClass."
-      - title: "Scenario 2: Gateway and Controller Login Issues"
-        overview: "Students trace an AAP Gateway login failure to an incorrect admin password, then reset it using the aap-gateway-manage utility inside the Gateway pod terminal."
-      - title: "Scenario 3: Node Selector and Resource Issues"
-        overview: "Students identify an invalid nodeSelector on the AAP CR database configuration that prevents PostgreSQL pods from scheduling, then correct or remove the selector to restore the deployment."
-      - title: "Scenario 4: Execution Environment Credentials"
-        overview: "Students identify a job template using an EE image from a private registry without a matching credential, and fix it by switching the EE to a publicly accessible alternative."
-      - title: "Scenario 5: Automation Hub Sync Issues"
-        overview: "Students resolve two compounding Hub sync failures: OOMKilled content worker pods (fixed by increasing memory limits in the AAP CR) and an undersized PVC (fixed by expanding storage in both the CR and the existing PVC)."
-      - title: "Scenario 6: ALIA Lightspeed Issues"
-        overview: "Students trace a missing ALIA chat icon to an unauthorized LLM model configured in the chatbot secret, then restore the correct model and force reconciliation by restarting the Lightspeed operator and API pods."
-      - title: "Conclusion"
-        overview: "Wrap-up summarizing the six scenarios and skills practiced, with links to AAP and OCP documentation."
+    - title: Welcome and Lab Credentials
+      overview: Orientation module explaining the break-and-fix lab structure, student
+        namespace layout, and credential access for all six AAP instances and the
+        OpenShift Console.
+    - title: 'Scenario 1: Automation Hub Storage Issue'
+      overview: Students diagnose Automation Hub pods stuck Pending due to a ReadWriteOnly
+        StorageClass and fix it by updating the AAP CR to use a CephFS RWX StorageClass.
+    - title: 'Scenario 2: Gateway and Controller Login Issues'
+      overview: Students trace an AAP Gateway login failure to an incorrect admin
+        password, then reset it using the aap-gateway-manage utility inside the Gateway
+        pod terminal.
+    - title: 'Scenario 3: Node Selector and Resource Issues'
+      overview: Students identify an invalid nodeSelector on the AAP CR database configuration
+        that prevents PostgreSQL pods from scheduling, then correct or remove the
+        selector to restore the deployment.
+    - title: 'Scenario 4: Execution Environment Credentials'
+      overview: Students identify a job template using an EE image from a private
+        registry without a matching credential, and fix it by switching the EE to
+        a publicly accessible alternative.
+    - title: 'Scenario 5: Automation Hub Sync Issues'
+      overview: 'Students resolve two compounding Hub sync failures: OOMKilled content
+        worker pods (fixed by increasing memory limits in the AAP CR) and an undersized
+        PVC (fixed by expanding storage in both the CR and the existing PVC).'
+    - title: 'Scenario 6: ALIA Lightspeed Issues'
+      overview: Students trace a missing ALIA chat icon to an unauthorized LLM model
+        configured in the chatbot secret, then restore the correct model and force
+        reconciliation by restarting the Lightspeed operator and API pods.
+    - title: Conclusion
+      overview: Wrap-up summarizing the six scenarios and skills practiced, with links
+        to AAP and OCP documentation.
     rcars_overlap_pct: 44
     rcars_top_matches:
-      - title: "Operations and Automation with OpenShift Virtualization"
-        ci_name: "openshift-cnv.virt-aap-day-2.prod"
-        url: "https://catalog.demo.redhat.com/catalog?item=openshift-cnv.virt-aap-day-2.prod"
-        relevance_score: 44
-        why_it_fits: "Covers both AAP and OCP together at an intermediate level, but focus is VM lifecycle automation not AAP Operator troubleshooting."
-      - title: "Experience OpenShift Virtualization: Advanced Operations and Automation"
-        ci_name: "openshift-cnv.ocp-virt-advanced-ops.prod"
-        url: "https://catalog.demo.redhat.com/catalog?item=openshift-cnv.ocp-virt-advanced-ops.prod"
-        relevance_score: 41
-        why_it_fits: "AAP + OCP pairing at intermediate level; AAP content is narrowly VM automation with no overlap on Hub/Gateway/Lightspeed troubleshooting."
-      - title: "Experience OpenShift Virtualization: Advanced Operations and Automation - Shared RHACM HUB"
-        ci_name: "openshift-cnv.ocp-virt-advanced-ops-hub.prod"
-        url: "https://catalog.demo.redhat.com/catalog?item=openshift-cnv.ocp-virt-advanced-ops-hub.prod"
-        relevance_score: 39
-        why_it_fits: "OpenShift and AAP together, but AAP content focused on VM lifecycle automation rather than Operator component failure diagnosis."
-    rejections: []
-
+    - title: Operations and Automation with OpenShift Virtualization
+      ci_name: openshift-cnv.virt-aap-day-2.prod
+      url: https://catalog.demo.redhat.com/catalog?item=openshift-cnv.virt-aap-day-2.prod
+      relevance_score: 44
+      why_it_fits: Covers both AAP and OCP together at an intermediate level, but
+        focus is VM lifecycle automation not AAP Operator troubleshooting.
+    - title: 'Experience OpenShift Virtualization: Advanced Operations and Automation'
+      ci_name: openshift-cnv.ocp-virt-advanced-ops.prod
+      url: https://catalog.demo.redhat.com/catalog?item=openshift-cnv.ocp-virt-advanced-ops.prod
+      relevance_score: 41
+      why_it_fits: AAP + OCP pairing at intermediate level; AAP content is narrowly
+        VM automation with no overlap on Hub/Gateway/Lightspeed troubleshooting.
+    - title: 'Experience OpenShift Virtualization: Advanced Operations and Automation
+        - Shared RHACM HUB'
+      ci_name: openshift-cnv.ocp-virt-advanced-ops-hub.prod
+      url: https://catalog.demo.redhat.com/catalog?item=openshift-cnv.ocp-virt-advanced-ops-hub.prod
+      relevance_score: 39
+      why_it_fits: OpenShift and AAP together, but AAP content focused on VM lifecycle
+        automation rather than Operator component failure diagnosis.
+    rejections:
+    - id: 318d8d4c-723d-4bd4-b711-d0946686ccab
+      text: It is too much content. You need to pick the modules that will fit in
+        the time allotted (2 hours) and save some time for intro/outro. Even if you
+        think these will fit in 2 hours, I would still cut even more - remember what
+        we had to do last time to remove modules at the last minute because it was
+        just too long.
+      resolved: false
+      reviewer: nstephan@redhat.com
+      timestamp: '2026-08-27T08:06:39.132171+00:00'
+    - id: 0233c930-d535-49d5-b229-32845a8febb4
+      text: I would like to see a couple different scenarios added that focus more
+        on the AAP part of the troubleshooting. You were the only one to submit a
+        troubleshooting lab for Ansible, but the topic slot was really for "Ansible
+        Troubleshooting". So please try to have a healthy mix (or more like 60/40)
+        of ansible/openshift things to do in the scenarios.
+      resolved: false
+      reviewer: nstephan@redhat.com
+      timestamp: '2026-08-27T08:06:39.132171+00:00'
   infra:
     peak_environments: null
-    cost_per_run_est: ""
-    provisioning_time_est: ""
-    agnosticv_base_ci: ""
-    approved_by: ""
+    cost_per_run_est: ''
+    provisioning_time_est: ''
+    agnosticv_base_ci: ''
+    approved_by: ''
     rejections: []
