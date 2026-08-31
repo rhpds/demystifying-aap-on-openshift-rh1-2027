@@ -4,11 +4,13 @@
 
 This lab gives AAP administrators hands-on experience diagnosing and recovering
 a production-style Ansible Automation Platform deployment running on OpenShift
-Container Platform. Six pre-broken AAP instances — one per scenario — present
-realistic failure conditions drawn from common operator misconfiguration and
-resource constraint patterns. Participants use the OpenShift Console and AAP UI
-to inspect pod events, logs, and Custom Resource definitions, then apply
-targeted fixes and validate recovery.
+Container Platform. All four scenarios are drawn from real AAP failure patterns
+observed by Red Hat Support and Services in customer environments. While some
+fixes involve OpenShift primitives — pod logs, storage configuration, Kubernetes
+Secrets — those are simply the diagnostic layer for an AAP problem; the subject
+of every scenario is the AAP deployment itself. Participants use the OpenShift
+Console and AAP UI to inspect pod events, logs, and Custom Resource definitions,
+then apply targeted fixes and validate recovery.
 
 ## Target Audience
 
@@ -75,6 +77,21 @@ Lab (hands-on)
 
 Each scenario module (2–5) has a companion solution reference sub-page; these
 are not separately timed in the map.
+
+### Optional / Bonus Modules (nice to have)
+
+Two additional scenarios are already fully developed and could be included as
+optional content for attendees who finish the four core scenarios early:
+
+| Module | Title | Duration |
+|--------|-------|----------|
+| — | Scenario 5: Execution Environment Credentials | ~20 min |
+| — | Scenario 6: Automation Hub Sync Issues | ~25 min |
+
+These were removed from the required path to keep the core lab within ~90
+minutes, which matches observed completion times. If included, they would be
+clearly marked as optional in the Showroom UI and would not be required for
+the Validate completion gate.
 
 ## Difficulty Level
 

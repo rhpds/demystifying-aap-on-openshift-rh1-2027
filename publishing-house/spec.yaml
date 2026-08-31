@@ -101,9 +101,12 @@ approval_checklist:
       on all four scenario modules. Validate confirms environment recovery; pass on
       all four constitutes completion.
     catalog_gap: No existing catalog item covers AAP Operator operational troubleshooting
-      on OpenShift. The existing catalog entry for this lab ran 4 scenarios at 90
-      min; this migration expands to 6 full scenarios (~2.5 hours) and enters the
-      Publishing House lifecycle.
+      on OpenShift from a support-and-services perspective. All four scenarios are
+      drawn from real failure patterns observed by Red Hat Support in customer AAP
+      deployments — giving practitioners hands-on experience with the exact issues
+      they are most likely to encounter in production, not synthetic exercises. The
+      existing catalog entry for this lab ran 4 scenarios at 90 min; this migration
+      refines and formalizes it through the Publishing House lifecycle.
     design_overview: 'A hands-on troubleshooting lab where AAP administrators and
       platform engineers diagnose and recover four pre-broken Ansible Automation Platform
       deployments running on OpenShift. Each scenario targets a distinct failure class:
