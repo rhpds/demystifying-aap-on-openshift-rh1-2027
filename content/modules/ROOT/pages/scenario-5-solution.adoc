@@ -1,73 +1,34 @@
-= 💡 Solution: Scenario 5 - Automation Hub sync issues
+= 💡 Solution: Scenario 5 - Execution Environment credentials
 
-This page provides the detailed solutions for the issues presented in Scenario 5, specifically resource and storage constraints during Automation Hub synchronization.
-
----
-
-== 🛑 Problem 1: Insufficient resource limits for content pods
-
-=== Diagnosis
-
-The *Automation Hub Content* worker pods were being terminated (likely `OOMKilled`) during the resource-intensive synchronization process because the defined memory limits were too low.
-
-=== 🛠️ Resolution: Increasing content resource limits
-
-The fix is to increase the resource requests and limits for the *Hub Content* workers directly in the main *Ansible Automation Platform Custom Resource (CR)*.
-
-==== 1. Update the AAP custom resource
-
-In the *OpenShift Console*:
-
-. Navigate to *Ecosystem → Installed Operators* and select your namespace.
-. Click on *Ansible Automation Platform* in the operator list.
-. Click the *Ansible Automation Platform* tab and click on your AAP instance.
-. Switch to the *YAML* tab and modify the `spec.hub.content.resource_requirements` section:
-
-[source,yaml]
-----
-# Example snippet of the modified AAP CR
-spec:
-  hub:
-    content:
-      resource_requirements:
-        limits:
-          cpu: 1000m
-          memory: 8Gi # Increased memory is key here
-        requests:
-          cpu: 100m
-          memory: 200Mi
-----
+This page provides the detailed solution for the issue presented in Scenario 5. Review these steps after you have attempted the diagnosis and resolution yourself.
 
 ---
 
-== 🛑 Problem 2: Insufficient Persistent Volume Claim (PVC) size
+== 🛑 Problem: Missing Execution Environment credential
 
 === Diagnosis
 
-Synchronization failed because the PVC for file storage was too small (e.g., `25Mi`), which cannot hold the repository's contents.
+One of the job templates was configured to use an *Execution Environment (EE)* image hosted in a private container registry (e.g., a Quay repository). The job failed because the necessary *Container Registry Credential* was not linked to the job template, resulting in an image pull failure.
 
-=== 🛠️ Resolution: Increasing PVC storage size
+The error message in the failed job's output confirms the authentication failure when attempting to pull the EE image.
 
-The fix involves increasing the requested storage size on both the CR and the existing PVC.
+=== 🛠️ Resolution: Switching the Execution Environment
 
-==== 1. Update the AAP custom resource (future PVCs)
+The solution is to modify the failing job template to reference an Execution Environment that is properly authenticated or publicly accessible.
 
-Still in the AAP CR *YAML* view, update the Hub file storage size so future PVCs use the correct size:
+==== 1. Identify and edit the failing job template
 
-[source,yaml]
-----
-# Example snippet of the modified AAP CR
-spec:
-  hub:
-    file_storage_size: 10Gi # Increase this value
-----
+In the *AAP UI*, navigate to *Automation Execution → Templates*. Select the template that failed execution (SUMMIT-T4).
 
-==== 2. Expand the existing PVC
+==== 2. Change the Execution Environment
 
-The storage size of the *existing* PVC must also be increased directly, as the CR change only affects future PVCs (this requires a StorageClass that supports volume expansion; `ocs-storagecluster-cephfs` supports this).
+Edit the job template configuration and switch the *Execution Environment* field to match the image being successfully used by the other job templates (Default Execution Environment).
 
-In the *OpenShift Console*, navigate to *Storage → PersistentVolumeClaims* and select your namespace. Find the Hub file storage PVC, open it, switch to the *YAML* view, change `spec.resources.requests.storage` to `10Gi`, and click *Save*.
+[NOTE]
+====
+The failing template was using an EE from a private Quay repository without a matching credential. Switching it to a known good EE resolves the authentication gap.
+====
 
-==== 3. Final verification
+==== 3. Verification
 
-Attempt the *Community* repository sync again in the AAP UI. A successful sync confirms the resolution.
+Save the configuration and launch the job template again. The job will successfully start, confirming the EE image is now pulled correctly.

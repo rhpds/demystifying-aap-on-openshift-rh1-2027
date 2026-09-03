@@ -1,44 +1,73 @@
-= 💡 Solution: Scenario 4 - ALIA Lightspeed issues
+= 💡 Solution: Scenario 6 - Automation Hub sync issues
 
-This page provides the detailed solution for the issue presented in Scenario 4, which involves an incorrect Large Language Model (LLM) configuration for Ansible Lightspeed Intelligent Assistant (ALIA).
+This page provides the detailed solutions for the issues presented in Scenario 6, specifically resource and storage constraints during Automation Hub synchronization.
 
 ---
 
-== 🛑 Problem: Invalid Large Language Model (LLM) configuration
+== 🛑 Problem 1: Insufficient resource limits for content pods
 
 === Diagnosis
 
-The *Ansible Lightspeed Intelligent Assistant (ALIA)* service was unable to initialize because it was configured to use a model that it was not authorized to access (`codellama-7b-instruct`). This prevents the ALIA UI component from being activated.
+The *Automation Hub Content* worker pods were being terminated (likely `OOMKilled`) during the resource-intensive synchronization process because the defined memory limits were too low.
 
-The pod logs for the `lightspeed-api` and `chatbot` pods confirm the model connection failure.
+=== 🛠️ Resolution: Increasing content resource limits
 
-=== 🛠️ Resolution: Updating the chatbot secret
+The fix is to increase the resource requests and limits for the *Hub Content* workers directly in the main *Ansible Automation Platform Custom Resource (CR)*.
 
-The configuration for the LLM is stored within the `chatbot-configuration-secret`. The fix is to edit this secret and replace the unauthorized model name with the correct one: `{alia_model}`.
+==== 1. Update the AAP custom resource
 
-==== 1. Update the chatbot configuration secret
+In the *OpenShift Console*:
 
-In the *OpenShift Console*, navigate to *Workloads → Secrets* in your namespace. Find `chatbot-configuration-secret`, open it and click *Edit*.
+. Navigate to *Ecosystem → Installed Operators* and select your namespace.
+. Click on *Ansible Automation Platform* in the operator list.
+. Click the *Ansible Automation Platform* tab and click on your AAP instance.
+. Switch to the *YAML* tab and modify the `spec.hub.content.resource_requirements` section:
 
-Update the `chatbot_model` value to the correct model name:
-
-[source,yaml,subs="+attributes"]
+[source,yaml]
 ----
-data:
-  chatbot_model: {alia_model}  # <--- CORRECT VALUE
+# Example snippet of the modified AAP CR
+spec:
+  hub:
+    content:
+      resource_requirements:
+        limits:
+          cpu: 1000m
+          memory: 8Gi # Increased memory is key here
+        requests:
+          cpu: 100m
+          memory: 200Mi
 ----
 
-[IMPORTANT]
-====
-Make sure you are editing the `chatbot_model` key specifically. If using the *Key/Value* editor, the console handles base64 encoding automatically. If editing raw YAML, the value must be base64-encoded.
-====
+---
 
-==== 2. Force reconciliation
+== 🛑 Problem 2: Insufficient Persistent Volume Claim (PVC) size
 
-The *Lightspeed Operator* must restart to pick up the changes from the secret.
+=== Diagnosis
 
-In the *OpenShift Console*, navigate to *Workloads → Pods* and select your namespace. Find the `ansible-lightspeed-operator-controller-manager...` pod, click the three-dot menu on the right, and select *Delete Pod*. Repeat for the `lightspeed-chatbot-api` and `lightspeed-api` pod. Both will restart automatically and pick up the corrected configuration.
+Synchronization failed because the PVC for file storage was too small (e.g., `25Mi`), which cannot hold the repository's contents.
 
-==== 3. Verification
+=== 🛠️ Resolution: Increasing PVC storage size
 
-Monitor *Workloads → Pods* until the Lightspeed pods are running and ready. Then log back into the AAP UI; the ALIA chat icon should reappear in the top navigation bar and respond to a test query.
+The fix involves increasing the requested storage size on both the CR and the existing PVC.
+
+==== 1. Update the AAP custom resource (future PVCs)
+
+Still in the AAP CR *YAML* view, update the Hub file storage size so future PVCs use the correct size:
+
+[source,yaml]
+----
+# Example snippet of the modified AAP CR
+spec:
+  hub:
+    file_storage_size: 10Gi # Increase this value
+----
+
+==== 2. Expand the existing PVC
+
+The storage size of the *existing* PVC must also be increased directly, as the CR change only affects future PVCs (this requires a StorageClass that supports volume expansion; `ocs-storagecluster-cephfs` supports this).
+
+In the *OpenShift Console*, navigate to *Storage → PersistentVolumeClaims* and select your namespace. Find the Hub file storage PVC, open it, switch to the *YAML* view, change `spec.resources.requests.storage` to `10Gi`, and click *Save*.
+
+==== 3. Final verification
+
+Attempt the *Community* repository sync again in the AAP UI. A successful sync confirms the resolution.
