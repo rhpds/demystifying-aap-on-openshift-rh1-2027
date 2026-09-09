@@ -1,0 +1,4 @@
+apiVersion: v2
+name: cluster-bootstrap
+description: Cluster-level app-of-apps for Demystifying AAP. Currently empty — ODF pre-installed, AAP operator is tenant-scoped. Add infra/platform charts here if needed in future.
+version: 0.1.0

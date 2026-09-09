@@ -1,0 +1,27 @@
+tenant:
+  username: ""
+  password: ""
+  namespace: ""        # {username}-scenario-{n}, injected from AgV
+  domain: ""           # cluster ingress domain e.g. apps.cluster.rhdp.net
+  apiUrl: ""           # cluster API URL, used to register break SA credential in AAP
+  scenario: 1          # which scenario to deploy (1-6)
+aap:
+  version: "2.7"
+  operatorChannel: stable-2.7
+  # TODO: confirm correct startingCSV for AAP 2.7 with Ryan
+  startingCSV: ""
+  manifest:
+    url: ""            # injected from AgV via ocp4_workload_gitops_bootstrap_helm_values
+  controller:
+    enabled: true
+  eda:
+    enabled: true
+  hub:
+    enabled: false                                          # override to true in AgV for scenarios that need Hub
+    fileStorageSize: 10Gi
+    fileStorageAccessMode: ReadWriteMany
+    fileStorageClass: ocs-storagecluster-cephfs   # CephFS required for RWX (internal ODF on AWS)
+alia:
+  token: ""
+  model: granite-3-2-8b-instruct
+  url: https://litellm-prod.apps.maas.redhatworkshops.io/v1

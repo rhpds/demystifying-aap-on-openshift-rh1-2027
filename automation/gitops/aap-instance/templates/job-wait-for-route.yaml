@@ -1,0 +1,36 @@
+---
+# Waits until the AAP gateway route is accessible (HTTP 200/302).
+# Runs at sync-wave 3 — after the AnsibleAutomationPlatform CR (wave 2).
+# The aap-instance Application is only Healthy when this Job completes,
+# which gates the bootstrap Application and therefore the Showroom deployment.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.tenant.username }}-aap-route-wait
+  namespace: {{ .Values.tenant.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  backoffLimit: 60     # 60 × 30s = 30 min max wait
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: wait-for-route
+        image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          GATEWAY_URL="https://{{ .Values.tenant.username }}-aap-{{ .Values.tenant.namespace }}.{{ .Values.tenant.domain }}"
+
+          echo "Waiting for AAP gateway route at ${GATEWAY_URL}..."
+          until curl -sk \
+            --max-time 10 \
+            -o /dev/null \
+            -w "%{http_code}" \
+            "${GATEWAY_URL}" | grep -qE "^(200|302|301)"; do
+            echo "Route not ready, retrying in 30s..."
+            sleep 30
+          done
+          echo "AAP gateway route is active."

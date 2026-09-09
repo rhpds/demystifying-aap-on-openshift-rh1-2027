@@ -1,5 +1,4 @@
 apiVersion: v2
 name: bootstrap-infra
-description: Cluster-scoped shared resources
-type: application
+description: Bootstraps Demystifying AAP cluster-level infra
 version: 0.1.0

@@ -1,0 +1,4 @@
+apiVersion: v2
+name: tenant-aap-instance
+description: AnsibleAutomationPlatform CR and admin Secret per user
+version: 0.1.0

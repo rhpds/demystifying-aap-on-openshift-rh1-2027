@@ -1,4 +1,29 @@
-deployer:
-  domain: apps.example.com
-
-username: user1
+bootstrap:
+  repoURL: https://github.com/rhpds/demystifying-aap-on-openshift-rh1-2027
+  targetRevision: main
+tenant:
+  username: ""        # injected by ocp4_workload_gitops_bootstrap
+  namespace: ""       # {username}-scenario-{n}
+  password: ""
+  domain: ""
+  apiUrl: ""          # cluster API URL for break SA credential
+  scenario: 1
+scenarios:            # all scenarios deployed per tenant order
+  - 1
+  - 2
+  - 3
+  - 4
+aap:
+  operatorChannel: stable-2.7
+  startingCSV: ""     # TODO: confirm correct startingCSV for AAP 2.7 with Ryan
+  manifest:
+    url: ""           # injected from AgV
+  hub:
+    enabled: false
+    fileStorageSize: 10Gi
+    fileStorageAccessMode: ReadWriteMany
+    fileStorageClass: ocs-storagecluster-cephfs
+alia:
+  token: ""           # litellm_master_key, injected from AgV (scenario 4 only)
+  model: granite-3-2-8b-instruct
+  url: https://litellm-prod.apps.maas.redhatworkshops.io/v1

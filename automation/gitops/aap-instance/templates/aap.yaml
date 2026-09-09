@@ -1,0 +1,160 @@
+apiVersion: aap.ansible.com/v1alpha1
+kind: AnsibleAutomationPlatform
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  name: {{ .Values.tenant.username }}-aap
+  namespace: {{ .Values.tenant.namespace }}
+spec:
+  admin_password_secret: {{ .Values.tenant.username }}-aap-admin-password
+  image_pull_policy: IfNotPresent
+  no_log: true
+  redis_mode: standalone
+  route_tls_termination_mechanism: Edge
+
+{{- if eq (int .Values.tenant.scenario) 1 }}
+  # Scenario 1: Hub only. No file_storage_storage_class — that is the intentional break.
+  # Students must diagnose why Hub fails to start (RWO vs RWX storage class requirement).
+  # file_storage_size is set to fit within tenant quota; the break is the missing storage class.
+  controller:
+    disabled: true
+  eda:
+    disabled: true
+  hub:
+    disabled: false
+    file_storage_size: 10Gi
+    nginx_proxy_send_timeout: 15s
+    nginx_proxy_read_timeout: 15s
+    nginx_proxy_connect_timeout: 15s
+    nginx_client_max_body_size: 10m
+    gunicorn_content_workers: 2
+    gunicorn_api_workers: 2
+    gunicorn_timeout: 10
+    haproxy_timeout: 180s
+    route_tls_termination_mechanism: Edge
+    ingress_type: Route
+    loadbalancer_port: 80
+    loadbalancer_protocol: http
+    no_log: true
+    image_pull_policy: IfNotPresent
+    force_drop_db: false
+
+{{- else if eq (int .Values.tenant.scenario) 4 }}
+  # Scenario 4: Controller + EDA, no Hub. Lightspeed enabled with correct model by default.
+  # The break job changes the model to wrong value. Students diagnose and restore correct model.
+  # FTL: fresh validate passes (lightspeed enabled, correct model) → break → validate fails → fix → validate passes
+  controller:
+    disabled: false
+    resource_requirements:
+      requests:
+        cpu: 250m
+        memory: 1Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+  eda:
+    disabled: false
+    activation_worker:
+      replicas: 0
+    resource_requirements:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+  hub:
+    disabled: true
+  lightspeed:
+    disabled: false
+
+{{- else if eq (int .Values.tenant.scenario) 99 }}
+  # Scenario 5 (Hub Sync) was cut from RH1 2027 — retained here as dead branch so the
+  # else covers scenarios 2-3 correctly.
+  controller:
+    disabled: false
+    resource_requirements:
+      requests:
+        cpu: 250m
+        memory: 1Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+  eda:
+    disabled: true
+  hub:
+    disabled: false
+    file_storage_size: 25Mi
+    file_storage_access_mode: {{ .Values.aap.hub.fileStorageAccessMode }}
+    file_storage_storage_class: {{ .Values.aap.hub.fileStorageClass }}
+    api:
+      resource_requirements:
+        requests:
+          cpu: 400m
+          memory: 500Mi
+        limits:
+          cpu: 1000m
+          memory: 1Gi
+    content:
+      resource_requirements:
+        requests:
+          cpu: 100m
+          memory: 200Mi
+        limits:
+          cpu: 500m
+          memory: 800Mi
+    worker:
+      resource_requirements:
+        requests:
+          cpu: 400m
+          memory: 500Mi
+        limits:
+          cpu: 1000m
+          memory: 1Gi
+
+{{- else }}
+  # Scenarios 2-3: Controller + Hub. Identical base spec — clean AAP deployed.
+  # The break is applied by the student via AAP job templates pre-loaded in their
+  # Controller instance (converted from break.yml roles in rh1-aap-troubleshooting).
+  controller:
+    disabled: false
+    resource_requirements:
+      requests:
+        cpu: 250m
+        memory: 1Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+  eda:
+    disabled: true
+  hub:
+    disabled: false
+    file_storage_size: {{ .Values.aap.hub.fileStorageSize }}
+    file_storage_access_mode: {{ .Values.aap.hub.fileStorageAccessMode }}
+    file_storage_storage_class: {{ .Values.aap.hub.fileStorageClass }}
+    api:
+      resource_requirements:
+        requests:
+          cpu: 400m
+          memory: 500Mi
+        limits:
+          cpu: 1000m
+          memory: 1Gi
+    content:
+      resource_requirements:
+        requests:
+          cpu: 100m
+          memory: 200Mi
+        limits:
+          cpu: 500m
+          memory: 800Mi
+    worker:
+      resource_requirements:
+        requests:
+          cpu: 400m
+          memory: 500Mi
+        limits:
+          cpu: 1000m
+          memory: 1Gi
+
+{{- end }}

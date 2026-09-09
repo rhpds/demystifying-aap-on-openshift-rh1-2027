@@ -1,0 +1,66 @@
+---
+# Injects the AAP subscription manifest via the AAP Gateway.
+# AAP 2.6: use gateway URL /api/controller/v2/config/ with base64-encoded JSON manifest.
+# Skips gracefully if Gateway is not reachable (Hub-only scenarios).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.tenant.username }}-aap-manifest
+  namespace: {{ .Values.tenant.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  backoffLimit: 20
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: inject-manifest
+        image: registry.access.redhat.com/ubi9/ubi:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          GATEWAY_URL="https://{{ .Values.tenant.username }}-aap-{{ .Values.tenant.namespace }}.{{ .Values.tenant.domain }}"
+          CONFIG_URL="${GATEWAY_URL}/api/controller/v2/config/"
+          echo "Checking if Gateway is reachable..."
+          HTTP=$(curl -sk --max-time 10 -o /dev/null -w "%{http_code}" "${GATEWAY_URL}/api/controller/v2/ping/" || echo "000")
+          if [ "${HTTP}" = "000" ] || [ "${HTTP}" = "404" ]; then
+            echo "Gateway not available (HTTP ${HTTP}) — skipping manifest injection."
+            exit 0
+          fi
+          echo "Waiting for AAP Gateway..."
+          until curl -sk --max-time 10 -u "admin:${ADMIN_PASSWORD}" "${GATEWAY_URL}/api/controller/v2/ping/" -o /dev/null -w "%{http_code}" | grep -q "200"; do
+            echo "Gateway not ready, retrying in 30s..."
+            sleep 30
+          done
+          echo "Gateway ready. Downloading manifest..."
+          curl -sSL -o /tmp/manifest.zip "${MANIFEST_URL}"
+          echo "Encoding manifest as base64..."
+          B64=$(base64 -w 0 /tmp/manifest.zip)
+          printf '{"eula_accepted": true, "manifest": "%s"}' "${B64}" > /tmp/manifest_payload.json
+          echo "Injecting manifest via ${CONFIG_URL}..."
+          RESULT=$(curl -sk -X POST \
+            -u "admin:${ADMIN_PASSWORD}" \
+            -H "Content-Type: application/json" \
+            -d @/tmp/manifest_payload.json \
+            -o /tmp/result.json \
+            -w "%{http_code}" \
+            "${CONFIG_URL}")
+          echo "HTTP status: ${RESULT}"
+          cat /tmp/result.json
+          echo ""
+          if echo "${RESULT}" | grep -qE "^2"; then
+            echo "Manifest injected successfully."
+          else
+            echo "Manifest injection failed." && exit 1
+          fi
+        env:
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.tenant.username }}-aap-admin-password
+              key: password
+        - name: MANIFEST_URL
+          value: {{ .Values.aap.manifest.url | quote }}

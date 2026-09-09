@@ -1,0 +1,59 @@
+{{- range .Values.scenarios }}
+{{- $scenario := . }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: aap-instance-{{ $.Values.tenant.username }}-scenario-{{ $scenario }}
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: {{ $.Values.bootstrap.repoURL }}
+    targetRevision: {{ $.Values.bootstrap.targetRevision }}
+    path: automation/gitops/aap-instance
+    helm:
+      values: |
+        tenant:
+          username: {{ $.Values.tenant.username }}
+          namespace: {{ $.Values.tenant.username }}-scenario-{{ $scenario }}
+          password: {{ $.Values.tenant.password }}
+          domain: {{ $.Values.tenant.domain }}
+          apiUrl: {{ $.Values.tenant.apiUrl | quote }}
+          scenario: {{ $scenario }}
+        aap:
+          operatorChannel: {{ $.Values.aap.operatorChannel }}
+          startingCSV: {{ $.Values.aap.startingCSV | quote }}
+          manifest:
+            url: {{ $.Values.aap.manifest.url | quote }}
+          hub:
+            enabled: {{ $.Values.aap.hub.enabled }}
+            fileStorageSize: {{ $.Values.aap.hub.fileStorageSize }}
+            fileStorageAccessMode: {{ $.Values.aap.hub.fileStorageAccessMode }}
+            fileStorageClass: {{ $.Values.aap.hub.fileStorageClass }}
+        alia:
+          token: {{ $.Values.alia.token | quote }}
+          model: {{ $.Values.alia.model }}
+          url: {{ $.Values.alia.url }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ $.Values.tenant.username }}-scenario-{{ $scenario }}
+  ignoreDifferences:
+    - kind: Secret
+      name: chatbot-configuration-secret
+      jsonPointers:
+        - /data
+    - group: aap.ansible.com
+      kind: AnsibleAutomationPlatform
+      jsonPointers:
+        - /spec
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions:
+      - CreateNamespace=false   # pre-created by ocp4_workload_tenant_namespace
+      - SkipDryRunOnMissingResource=true
+{{- end }}

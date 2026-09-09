@@ -1,0 +1,53 @@
+---
+# Required extra vars:
+#   namespace    — user's scenario namespace (e.g. user-abc12-scenario-6)
+#   aap_cr_name  — AAP CR name (e.g. user-abc12-aap)
+- name: Break Scenario 6
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Adjusting some stuff....
+      no_log: true
+      block:
+        - name: Taking a Short Nap
+          ansible.builtin.set_fact:
+            break_model: codellama-7b-instruct
+
+        - name: Perform Level 6 Compliance Yoga
+          kubernetes.core.k8s:
+            api_version: v1
+            kind: Secret
+            name: chatbot-configuration-secret
+            namespace: "{{ namespace }}"
+            state: patched
+            definition:
+              apiVersion: v1
+              kind: Secret
+              metadata:
+                name: chatbot-configuration-secret
+                namespace: "{{ namespace }}"
+              type: Opaque
+              stringData:
+                chatbot_model: "{{ break_model }}"
+
+        - name: Re-platform the Core Data Spigot
+          kubernetes.core.k8s:
+            state: present
+            merge_type: merge
+            definition:
+              apiVersion: aap.ansible.com/v1alpha1
+              kind: AnsibleAutomationPlatform
+              metadata:
+                name: "{{ aap_cr_name }}"
+                namespace: "{{ namespace }}"
+              spec:
+                lightspeed:
+                  chatbot_config_secret_name: chatbot-configuration-secret
+                  disabled: false
+
+        - name: Log in to AAP, figure out why ALIA icon won't come up
+          ansible.builtin.debug:
+            msg: |-
+              Log in to AAP, figure out why ALIA icon won't come up.
+              Find out what's failing.
+          no_log: false

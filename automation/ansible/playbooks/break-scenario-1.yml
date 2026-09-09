@@ -1,0 +1,16 @@
+---
+# Scenario 1: Hub Storage
+# The break is already in the deployment — Hub is configured without a storage class,
+# so it defaults to RWO. Hub requires RWX, causing it to fail to start.
+# No action required. This playbook exists for interface consistency.
+- name: Break Scenario 1 — Hub Storage
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Display scenario guidance
+      ansible.builtin.debug:
+        msg: |-
+          Scenario 1 is already broken.
+          Hub was deployed but something is going on with the Hub Pods.
+          Find out why the Hub UI is unavailable.
+          Hint: focus on the Hub Pod events and the storage configuration.

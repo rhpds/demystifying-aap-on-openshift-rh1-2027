@@ -1,5 +1,4 @@
 apiVersion: v2
 name: bootstrap-tenant
-description: Per-user tenant environment
-type: application
+description: Bootstraps per-user AAP resources
 version: 0.1.0

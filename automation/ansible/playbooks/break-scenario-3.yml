@@ -1,0 +1,108 @@
+---
+# Required extra vars:
+#   namespace    — user's scenario namespace (e.g. user-abc12-scenario-3)
+#   aap_cr_name  — AAP CR name (e.g. user-abc12-aap)
+- name: Break Scenario 3
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Make sure its broken
+      kubernetes.core.k8s:
+        api_version: apps/v1
+        kind: Deployment
+        namespace: "{{ namespace }}"
+        name: "{{ aap_cr_name }}-gateway"
+        merge_type: merge
+        resource_definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: "{{ aap_cr_name }}-gateway"
+            namespace: "{{ namespace }}"
+          spec:
+            replicas: 0
+      no_log: true
+
+    - name: Make sure its broken x2
+      kubernetes.core.k8s:
+        api_version: apps/v1
+        kind: Deployment
+        namespace: "{{ namespace }}"
+        name: aap-gateway-operator-controller-manager
+        merge_type: merge
+        resource_definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: aap-gateway-operator-controller-manager
+            namespace: "{{ namespace }}"
+          spec:
+            replicas: 0
+      no_log: true
+
+    - name: mmm... yes... breaking things
+      kubernetes.core.k8s:
+        state: patched
+        definition:
+          apiVersion: aap.ansible.com/v1alpha1
+          kind: AnsibleAutomationPlatform
+          metadata:
+            name: "{{ aap_cr_name }}"
+            namespace: "{{ namespace }}"
+          spec:
+            database:
+              node_selector:
+                kubernetes.io/os: not_linux
+      no_log: true
+
+    - name: Extra Broke
+      kubernetes.core.k8s:
+        api_version: apps/v1
+        kind: Deployment
+        namespace: "{{ namespace }}"
+        name: "{{ aap_cr_name }}-gateway"
+        merge_type: merge
+        resource_definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: "{{ aap_cr_name }}-gateway"
+            namespace: "{{ namespace }}"
+          spec:
+            replicas: 1
+      no_log: true
+
+    - name: Extra Broke x2
+      kubernetes.core.k8s:
+        api_version: apps/v1
+        kind: Deployment
+        namespace: "{{ namespace }}"
+        name: aap-gateway-operator-controller-manager
+        merge_type: merge
+        resource_definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: aap-gateway-operator-controller-manager
+            namespace: "{{ namespace }}"
+          spec:
+            replicas: 1
+      no_log: true
+
+    - name: Mic check 1....2....3....
+      kubernetes.core.k8s_info:
+        kind: Pod
+        api_version: v1
+        namespace: "{{ namespace }}"
+        label_selectors:
+          - app.kubernetes.io/name=postgres-15
+          - "app.kubernetes.io/instance=postgres-15-{{ aap_cr_name }}"
+          - app.kubernetes.io/component=database
+      register: _pg_pod
+      retries: 60
+      delay: 15
+      until:
+        - _pg_pod['resources'] | length
+        - _pg_pod.resources[0].status.phase == "Pending"
+      no_log: true
+

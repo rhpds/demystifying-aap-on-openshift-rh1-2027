@@ -1,0 +1,172 @@
+---
+# PostSync job that configures AAP Controller after manifest injection:
+#   1. Registers the namespace-admin SA as an OpenShift credential
+#   2. Creates a project pointing to demystifying-aap-on-openshift-rh1-2027
+#   3. Creates a "Break Scenario" job template for the current scenario
+#
+# Runs at sync-wave 1 (after manifest injection at wave 0).
+# Deleted on success.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.tenant.username }}-aap-configure
+  namespace: {{ .Values.tenant.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  backoffLimit: 20
+  template:
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: aap-break-sa
+      volumes:
+      - name: sa-token
+        secret:
+          secretName: aap-break-sa-token
+      containers:
+      - name: configure-aap
+        image: registry.access.redhat.com/ubi9/ubi:latest
+        volumeMounts:
+        - name: sa-token
+          mountPath: /var/run/secrets/break-sa
+          readOnly: true
+        command:
+        - /bin/sh
+        - -c
+        - |
+          GATEWAY_URL="https://{{ .Values.tenant.username }}-aap-{{ .Values.tenant.namespace }}.{{ .Values.tenant.domain }}"
+          SA_TOKEN=$(cat /var/run/secrets/break-sa/token)
+          SCENARIO="{{ .Values.tenant.scenario }}"
+          NAMESPACE="{{ .Values.tenant.namespace }}"
+          AAP_CR_NAME="{{ .Values.tenant.username }}-aap"
+
+          # ----------------------------------------------------------------
+          # Check if Controller is available (skip gracefully if disabled)
+          # ----------------------------------------------------------------
+          echo "Checking if Controller is available..."
+          HTTP=$(curl -sk --max-time 10 -o /dev/null -w "%{http_code}" \
+            "${GATEWAY_URL}/api/controller/v2/ping/" || echo "000")
+          if [ "${HTTP}" = "000" ] || [ "${HTTP}" = "404" ]; then
+            echo "Controller not available (HTTP ${HTTP}) — skipping configuration (scenario 1: controller disabled)."
+            exit 0
+          fi
+
+          echo "Waiting for AAP Controller..."
+          until curl -sk -u "admin:${ADMIN_PASSWORD}" \
+            "${GATEWAY_URL}/api/controller/v2/ping/" \
+            -o /dev/null -w "%{http_code}" | grep -q "200"; do
+            echo "Controller not ready, retrying in 30s..."
+            sleep 30
+          done
+          echo "Controller ready."
+
+          # ----------------------------------------------------------------
+          # 1. Register namespace-admin SA as OpenShift credential
+          # ----------------------------------------------------------------
+          echo "Looking up OpenShift credential type..."
+          CRED_TYPE_ID=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
+            "${GATEWAY_URL}/api/controller/v2/credential_types/?name=OpenShift+or+Kubernetes+API+Bearer+Token" \
+            | python3 -c "import sys,json; print(json.load(sys.stdin)['results'][0]['id'])")
+          echo "Credential type ID: ${CRED_TYPE_ID}"
+
+          echo "Creating namespace-admin credential..."
+          curl -sk -X POST \
+            -u "admin:${ADMIN_PASSWORD}" \
+            -H "Content-Type: application/json" \
+            "${GATEWAY_URL}/api/controller/v2/credentials/" \
+            -d "{
+              \"name\": \"Namespace Admin SA\",
+              \"description\": \"Namespace-scoped SA token for break/fix job templates\",
+              \"credential_type\": ${CRED_TYPE_ID},
+              \"organization\": 1,
+              \"inputs\": {
+                \"host\": \"${CLUSTER_API_URL}\",
+                \"bearer_token\": \"${SA_TOKEN}\",
+                \"verify_ssl\": false
+              }
+            }" > /dev/null
+          echo "Credential registered."
+
+          CRED_ID=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
+            "${GATEWAY_URL}/api/controller/v2/credentials/?name=Namespace+Admin+SA" \
+            | python3 -c "import sys,json; print(json.load(sys.stdin)['results'][0]['id'])")
+
+          # ----------------------------------------------------------------
+          # 2. Create project
+          # ----------------------------------------------------------------
+          echo "Creating AAP Troubleshooting project..."
+          curl -sk -X POST \
+            -u "admin:${ADMIN_PASSWORD}" \
+            -H "Content-Type: application/json" \
+            "${GATEWAY_URL}/api/controller/v2/projects/" \
+            -d '{
+              "name": "AAP Troubleshooting Demo",
+              "description": "Break/fix playbooks for demystifying AAP on OCP",
+              "organization": 1,
+              "scm_type": "git",
+              "scm_url": "https://github.com/rhpds/demystifying-aap-on-openshift-rh1-2027.git",
+              "scm_branch": "main",
+              "scm_update_on_launch": false
+            }' > /dev/null
+
+          PROJECT_ID=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
+            "${GATEWAY_URL}/api/controller/v2/projects/?name=AAP+Troubleshooting+Demo" \
+            | python3 -c "import sys,json; print(json.load(sys.stdin)['results'][0]['id'])")
+          echo "Project ID: ${PROJECT_ID}"
+
+          echo "Waiting for project sync..."
+          for i in $(seq 1 30); do
+            STATUS=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
+              "${GATEWAY_URL}/api/controller/v2/projects/${PROJECT_ID}/" \
+              | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])")
+            echo "  Status: ${STATUS}"
+            [ "${STATUS}" = "successful" ] && break
+            [ "${STATUS}" = "failed" ] && echo "Project sync failed!" && exit 1
+            sleep 10
+          done
+
+          # ----------------------------------------------------------------
+          # 3. Create break job template for this scenario
+          # ----------------------------------------------------------------
+          echo "Creating Break Scenario ${SCENARIO} job template..."
+          curl -sk -X POST \
+            -u "admin:${ADMIN_PASSWORD}" \
+            -H "Content-Type: application/json" \
+            "${GATEWAY_URL}/api/controller/v2/job_templates/" \
+            -d "{
+              \"name\": \"Break Scenario\",
+              \"description\": \"Apply the break for scenario ${SCENARIO}\",
+              \"organization\": 1,
+              \"project\": ${PROJECT_ID},
+              \"playbook\": \"playbooks/break-scenario-${SCENARIO}.yml\",
+              \"inventory\": 1,
+              \"job_type\": \"run\",
+              \"allow_simultaneous\": false,
+              \"extra_vars\": \"{\\\"namespace\\\": \\\"${NAMESPACE}\\\", \\\"aap_cr_name\\\": \\\"${AAP_CR_NAME}\\\"}\"
+            }" > /dev/null
+
+          JT_ID=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
+            "${GATEWAY_URL}/api/controller/v2/job_templates/?name=Break+Scenario" \
+            | python3 -c "import sys,json; print(json.load(sys.stdin)['results'][0]['id'])")
+
+          echo "Attaching Namespace Admin SA credential to job template..."
+          curl -sk -X POST \
+            -u "admin:${ADMIN_PASSWORD}" \
+            -H "Content-Type: application/json" \
+            "${GATEWAY_URL}/api/controller/v2/job_templates/${JT_ID}/credentials/" \
+            -d "{\"id\": ${CRED_ID}}" > /dev/null
+
+          echo "AAP Controller configured successfully."
+          echo "  Project: AAP Troubleshooting Demo"
+          echo "  Job template: Break Scenario (scenario ${SCENARIO})"
+          echo "  Credential: Namespace Admin SA"
+        env:
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.tenant.username }}-aap-admin-password
+              key: password
+        - name: CLUSTER_API_URL
+          value: {{ .Values.tenant.apiUrl | quote }}

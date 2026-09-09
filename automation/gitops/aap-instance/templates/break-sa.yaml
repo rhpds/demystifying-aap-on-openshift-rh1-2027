@@ -1,0 +1,35 @@
+---
+# ServiceAccount used by AAP break/fix job templates to make Kubernetes
+# API calls against the user's own namespace (namespace-admin only).
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aap-break-sa
+  namespace: {{ .Values.tenant.namespace }}
+---
+# Bind namespace-admin to the SA — enough for all break/fix operations.
+# No cluster-admin required.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aap-break-sa-admin
+  namespace: {{ .Values.tenant.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+subjects:
+- kind: ServiceAccount
+  name: aap-break-sa
+  namespace: {{ .Values.tenant.namespace }}
+---
+# Long-lived token for the SA — mounted by the configure-aap job to
+# register the OpenShift credential in AAP Controller.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aap-break-sa-token
+  namespace: {{ .Values.tenant.namespace }}
+  annotations:
+    kubernetes.io/service-account.name: aap-break-sa
+type: kubernetes.io/service-account-token
