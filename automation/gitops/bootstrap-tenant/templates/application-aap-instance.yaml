@@ -15,7 +15,7 @@ spec:
   source:
     repoURL: {{ $.Values.bootstrap.repoURL }}
     targetRevision: {{ $.Values.bootstrap.targetRevision }}
-    path: automation/gitops/aap-instance
+    path: automation/gitops/bootstrap-tenant/aap-instance
     helm:
       values: |
         tenant:
