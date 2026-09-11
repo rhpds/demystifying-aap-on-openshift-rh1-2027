@@ -20,7 +20,7 @@ aap:
     enabled: false                                          # override to true in AgV for scenarios that need Hub
     fileStorageSize: 10Gi
     fileStorageAccessMode: ReadWriteMany
-    fileStorageClass: ocs-storagecluster-cephfs   # CephFS required for RWX (internal ODF on AWS)
+    fileStorageClass: ocs-external-storagecluster-cephfs   # CephFS RWX — external ODF on CNV clusters
 alia:
   token: ""
   model: granite-3-2-8b-instruct
