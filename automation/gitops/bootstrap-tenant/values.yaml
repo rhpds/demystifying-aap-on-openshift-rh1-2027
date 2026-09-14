@@ -14,8 +14,8 @@ scenarios:            # all scenarios deployed per tenant order
   - 3
   - 4
 aap:
-  operatorChannel: stable-2.7
-  startingCSV: ""     # TODO: confirm correct startingCSV for AAP 2.7 with Ryan
+  operatorChannel: stable-2.6
+  startingCSV: "aap-operator.v2.6.0-0.1772556720"
   manifest:
     url: ""           # injected from AgV
   hub:
