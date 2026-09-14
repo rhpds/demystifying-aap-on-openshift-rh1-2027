@@ -27,32 +27,24 @@ spec:
         - name: sa-token
           mountPath: /var/run/secrets/break-sa
           readOnly: true
+        env:
+        - name: TARGET_CSV
+          value: "{{ .Values.aap.startingCSV }}"
         command:
         - /bin/sh
         - -c
         - |
           NS="{{ .Values.tenant.namespace }}"
-          TARGET_CSV="{{ .Values.aap.startingCSV }}"
           API="https://kubernetes.default.svc"
           TOKEN=$(cat /var/run/secrets/break-sa/token)
-
-          echo "Waiting for InstallPlan containing $TARGET_CSV in $NS..."
+          echo "Waiting for InstallPlan for $TARGET_CSV in $NS..."
           for i in $(seq 1 60); do
-            IP_NAME=$(curl -sk \
-              -H "Authorization: Bearer $TOKEN" \
+            IP_NAME=$(curl -sk -H "Authorization: Bearer $TOKEN" \
               "$API/apis/operators.coreos.com/v1alpha1/namespaces/$NS/installplans" \
-              | python3 -c "
-import sys, json
-d = json.load(sys.stdin)
-for ip in d.get('items', []):
-    csvs = ip.get('spec', {}).get('clusterServiceVersionNames', [])
-    if '$TARGET_CSV' in csvs and not ip.get('spec', {}).get('approved', False):
-        print(ip['metadata']['name'])
-        break
-" 2>/dev/null)
-
+              | python3 -c 'import sys,json,os; t=os.getenv("TARGET_CSV",""); d=json.load(sys.stdin); [print(ip["metadata"]["name"]) for ip in d.get("items",[]) if t in ip.get("spec",{}).get("clusterServiceVersionNames",[]) and not ip.get("spec",{}).get("approved",False)]' \
+              | head -1)
             if [ -n "$IP_NAME" ]; then
-              echo "Found InstallPlan $IP_NAME — approving..."
+              echo "Found InstallPlan $IP_NAME -- approving..."
               curl -sk -X PATCH \
                 -H "Authorization: Bearer $TOKEN" \
                 -H "Content-Type: application/merge-patch+json" \
@@ -61,10 +53,8 @@ for ip in d.get('items', []):
               echo "InstallPlan approved."
               exit 0
             fi
-
             echo "  not found yet ($i/60), retrying in 10s..."
             sleep 10
           done
-
           echo "Timed out waiting for InstallPlan."
           exit 1
