@@ -6,7 +6,8 @@ metadata:
   namespace: {{ .Values.tenant.namespace }}
 spec:
   channel: "{{ .Values.aap.operatorChannel }}"
-  installPlanApproval: Automatic
+  installPlanApproval: Manual
   name: ansible-automation-platform-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
+  startingCSV: "{{ .Values.aap.startingCSV }}"
