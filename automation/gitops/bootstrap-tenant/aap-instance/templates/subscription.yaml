@@ -4,6 +4,8 @@ kind: Subscription
 metadata:
   name: ansible-automation-platform-operator
   namespace: {{ .Values.tenant.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipHealthCheck=true
 spec:
   channel: "{{ .Values.aap.operatorChannel }}"
   installPlanApproval: Manual
