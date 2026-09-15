@@ -56,4 +56,5 @@ spec:
     syncOptions:
       - CreateNamespace=false   # pre-created by ocp4_workload_tenant_namespace
       - SkipDryRunOnMissingResource=true
+      - SkipHealthCheck=true
 {{- end }}
