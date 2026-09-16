@@ -19,6 +19,14 @@ spec:
       limits:
         cpu: 1000m
         memory: 2Gi
+  proxy:
+    resource_requirements:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
 
 {{- if eq (int .Values.tenant.scenario) 1 }}
   # Scenario 1: Hub only. No file_storage_storage_class — that is the intentional break.
