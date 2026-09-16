@@ -6,9 +6,8 @@ tenant:
   apiUrl: ""           # cluster API URL, used to register break SA credential in AAP
   scenario: 1          # which scenario to deploy (1-6)
 aap:
-  version: "2.7"
+  version: "2.6"
   operatorChannel: stable-2.6
-  startingCSV: "aap-operator.v2.6.0-0.1772556720"
   manifest:
     url: ""            # injected from AgV via ocp4_workload_gitops_bootstrap_helm_values
   controller:

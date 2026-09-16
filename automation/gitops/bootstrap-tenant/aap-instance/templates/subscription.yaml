@@ -8,8 +8,7 @@ metadata:
     argocd.argoproj.io/sync-options: SkipHealthCheck=true
 spec:
   channel: "{{ .Values.aap.operatorChannel }}"
-  installPlanApproval: Manual
+  installPlanApproval: Automatic
   name: ansible-automation-platform-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  startingCSV: "{{ .Values.aap.startingCSV }}"
