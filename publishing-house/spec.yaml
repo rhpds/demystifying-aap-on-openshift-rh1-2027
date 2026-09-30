@@ -11,7 +11,7 @@ project:
     them break the cluster, then providing them with the troubleshooting steps to
     recover.
   jira_ticket: RHDPCD-1053
-  workflow_id: 9860cd34-65ac-4f18-af7d-2976e0e69850
+  workflow_id: f87a24d3-93a8-459d-bcad-be8492bf57d3
 spec:
   title: Demystifying Ansible Automation Platform on OpenShift Container Platform
   learning_objectives:
