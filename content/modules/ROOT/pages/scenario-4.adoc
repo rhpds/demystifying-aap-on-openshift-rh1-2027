@@ -9,10 +9,8 @@
 == Objectives
 
 * Log in to the *AAP Gateway UI* successfully.
-* Observe that the *ALIA* chat icon is missing from the interface.
-+
-image::chat_icon.png[Reference of the ALIA chat icon, width=317, align="left", link=self, window=_blank]
-* Diagnose the underlying issue preventing the ALIA UI component from activating.
+* Observe that the *ALIA* chat icon is present in the interface.
+* Diagnose the underlying issue preventing the ALIA assistant from responding.
 * Resolve the issue to restore the assistant.
 
 [IMPORTANT]
@@ -66,9 +64,13 @@ The job template you just ran is configuring the Lightspeed chat bot, it takes a
 
 Please wait for it to complete before proceeding.
 
-=== Step 2: Confirm the ALIA icon is missing
+=== Step 2: Confirm the ALIA icon is present and attempt to chat with it
 
-Log into AAP and confirm the chat icon is not visible in the interface.
+Log into AAP. Confirm the ALIA chat icon is visible in the interface — click on it and attempt to send a message. Note that the assistant does not respond.
+
+image::chat_icon.png[The ALIA chat icon in the AAP Gateway UI, width=317, align="left", link=self, window=_blank]
+
+image::alia_chat_ui.png[ALIA chat panel open with no response, align="left", link=self, window=_blank]
 
 === Step 3: Inspect Lightspeed pod logs
 
@@ -92,7 +94,7 @@ Refer to the solution page if needed: xref:scenario-4-solution.adoc[Solution: AL
 
 === Step 6: Verify
 
-After applying the fix and allowing the Lightspeed pods to reconcile, log back into AAP and confirm the ALIA chat icon is now visible and responsive.
+After applying the fix and allowing the Lightspeed pods to reconcile, log back into AAP, click the ALIA chat icon, and confirm the assistant is now responding to messages.
 
 == Hint
 

@@ -8,7 +8,7 @@ This page provides the detailed solution for the issue presented in Scenario 4, 
 
 === Diagnosis
 
-The *Ansible Lightspeed Intelligent Assistant (ALIA)* service was unable to initialize because it was configured to use a model that it was not authorized to access (`codellama-7b-instruct`). This prevents the ALIA UI component from being activated.
+The *Ansible Lightspeed Intelligent Assistant (ALIA)* chat icon is visible in the AAP Gateway UI, but the assistant does not respond when a message is sent. The ALIA UI component loads, but the underlying service fails to activate because it is configured to use a model it is not authorized to access (`codellama-7b-instruct`).
 
 The pod logs for the `lightspeed-api` and `chatbot` pods confirm the model connection failure.
 
@@ -41,4 +41,4 @@ In the *OpenShift Console*, navigate to *Workloads → Pods* and select your nam
 
 ==== 3. Verification
 
-Monitor *Workloads → Pods* until the Lightspeed pods are running and ready. Then log back into the AAP UI; the ALIA chat icon should reappear in the top navigation bar and respond to a test query.
+Monitor *Workloads → Pods* until the Lightspeed pods are running and ready. Then log back into the AAP UI, click the ALIA chat icon, and send a test message — the assistant should now respond, confirming the LLM connection has been restored.
