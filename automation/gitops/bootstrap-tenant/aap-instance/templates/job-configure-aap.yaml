@@ -71,27 +71,34 @@ spec:
             | python3 -c "import sys,json; print(json.load(sys.stdin)['results'][0]['id'])")
           echo "Credential type ID: ${CRED_TYPE_ID}"
 
-          echo "Creating namespace-admin credential..."
-          HTTP=$(curl -sk -X POST \
-            -u "admin:${ADMIN_PASSWORD}" \
-            -H "Content-Type: application/json" \
-            "${GATEWAY_URL}/api/controller/v2/credentials/" \
-            -d "{
-              \"name\": \"Namespace Admin SA\",
-              \"description\": \"Namespace-scoped SA token for break/fix job templates\",
-              \"credential_type\": ${CRED_TYPE_ID},
-              \"organization\": 1,
-              \"inputs\": {
-                \"host\": \"${CLUSTER_API_URL}\",
-                \"bearer_token\": \"${SA_TOKEN}\",
-                \"verify_ssl\": false
-              }
-            }" \
-            -o /tmp/resp.json -w "%{http_code}")
-          if ! echo "${HTTP}" | grep -qE "^(2|409)"; then
-            echo "ERROR creating credential (HTTP ${HTTP}):"; cat /tmp/resp.json; exit 1
+          CRED_COUNT=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
+            "${GATEWAY_URL}/api/controller/v2/credentials/?name=Namespace+Admin+SA" \
+            | python3 -c "import sys,json; print(json.load(sys.stdin)['count'])")
+          if [ "${CRED_COUNT}" = "0" ]; then
+            echo "Creating namespace-admin credential..."
+            HTTP=$(curl -sk -X POST \
+              -u "admin:${ADMIN_PASSWORD}" \
+              -H "Content-Type: application/json" \
+              "${GATEWAY_URL}/api/controller/v2/credentials/" \
+              -d "{
+                \"name\": \"Namespace Admin SA\",
+                \"description\": \"Namespace-scoped SA token for break/fix job templates\",
+                \"credential_type\": ${CRED_TYPE_ID},
+                \"organization\": 1,
+                \"inputs\": {
+                  \"host\": \"${CLUSTER_API_URL}\",
+                  \"bearer_token\": \"${SA_TOKEN}\",
+                  \"verify_ssl\": false
+                }
+              }" \
+              -o /tmp/resp.json -w "%{http_code}")
+            if ! echo "${HTTP}" | grep -qE "^2"; then
+              echo "ERROR creating credential (HTTP ${HTTP}):"; cat /tmp/resp.json; exit 1
+            fi
+            echo "Credential created (HTTP ${HTTP})."
+          else
+            echo "Credential already exists, skipping creation."
           fi
-          echo "Credential registered (HTTP ${HTTP})."
 
           CRED_ID=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
             "${GATEWAY_URL}/api/controller/v2/credentials/?name=Namespace+Admin+SA" \
@@ -101,25 +108,32 @@ spec:
           # ----------------------------------------------------------------
           # 2. Create project
           # ----------------------------------------------------------------
-          echo "Creating AAP Troubleshooting project..."
-          HTTP=$(curl -sk -X POST \
-            -u "admin:${ADMIN_PASSWORD}" \
-            -H "Content-Type: application/json" \
-            "${GATEWAY_URL}/api/controller/v2/projects/" \
-            -d '{
-              "name": "AAP Troubleshooting Demo",
-              "description": "Break/fix playbooks for demystifying AAP on OCP",
-              "organization": 1,
-              "scm_type": "git",
-              "scm_url": "https://github.com/rhpds/demystifying-aap-on-openshift-rh1-2027.git",
-              "scm_branch": "main",
-              "scm_update_on_launch": false
-            }' \
-            -o /tmp/resp.json -w "%{http_code}")
-          if ! echo "${HTTP}" | grep -qE "^(2|409)"; then
-            echo "ERROR creating project (HTTP ${HTTP}):"; cat /tmp/resp.json; exit 1
+          PROJ_COUNT=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
+            "${GATEWAY_URL}/api/controller/v2/projects/?name=AAP+Troubleshooting+Demo" \
+            | python3 -c "import sys,json; print(json.load(sys.stdin)['count'])")
+          if [ "${PROJ_COUNT}" = "0" ]; then
+            echo "Creating AAP Troubleshooting project..."
+            HTTP=$(curl -sk -X POST \
+              -u "admin:${ADMIN_PASSWORD}" \
+              -H "Content-Type: application/json" \
+              "${GATEWAY_URL}/api/controller/v2/projects/" \
+              -d '{
+                "name": "AAP Troubleshooting Demo",
+                "description": "Break/fix playbooks for demystifying AAP on OCP",
+                "organization": 1,
+                "scm_type": "git",
+                "scm_url": "https://github.com/rhpds/demystifying-aap-on-openshift-rh1-2027.git",
+                "scm_branch": "main",
+                "scm_update_on_launch": false
+              }' \
+              -o /tmp/resp.json -w "%{http_code}")
+            if ! echo "${HTTP}" | grep -qE "^2"; then
+              echo "ERROR creating project (HTTP ${HTTP}):"; cat /tmp/resp.json; exit 1
+            fi
+            echo "Project created (HTTP ${HTTP})."
+          else
+            echo "Project already exists, skipping creation."
           fi
-          echo "Project created/exists (HTTP ${HTTP})."
 
           PROJECT_ID=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
             "${GATEWAY_URL}/api/controller/v2/projects/?name=AAP+Troubleshooting+Demo" \
@@ -140,27 +154,34 @@ spec:
           # ----------------------------------------------------------------
           # 3. Create break job template for this scenario
           # ----------------------------------------------------------------
-          echo "Creating Break Scenario ${SCENARIO} job template..."
-          HTTP=$(curl -sk -X POST \
-            -u "admin:${ADMIN_PASSWORD}" \
-            -H "Content-Type: application/json" \
-            "${GATEWAY_URL}/api/controller/v2/job_templates/" \
-            -d "{
-              \"name\": \"Break Scenario\",
-              \"description\": \"Apply the break for scenario ${SCENARIO}\",
-              \"organization\": 1,
-              \"project\": ${PROJECT_ID},
-              \"playbook\": \"automation/ansible/playbooks/break-scenario-${SCENARIO}.yml\",
-              \"inventory\": 1,
-              \"job_type\": \"run\",
-              \"allow_simultaneous\": false,
-              \"extra_vars\": \"{\\\"namespace\\\": \\\"${NAMESPACE}\\\", \\\"aap_cr_name\\\": \\\"${AAP_CR_NAME}\\\"}\"
-            }" \
-            -o /tmp/resp.json -w "%{http_code}")
-          if ! echo "${HTTP}" | grep -qE "^(2|409)"; then
-            echo "ERROR creating job template (HTTP ${HTTP}):"; cat /tmp/resp.json; exit 1
+          JT_COUNT=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
+            "${GATEWAY_URL}/api/controller/v2/job_templates/?name=Break+Scenario" \
+            | python3 -c "import sys,json; print(json.load(sys.stdin)['count'])")
+          if [ "${JT_COUNT}" = "0" ]; then
+            echo "Creating Break Scenario ${SCENARIO} job template..."
+            HTTP=$(curl -sk -X POST \
+              -u "admin:${ADMIN_PASSWORD}" \
+              -H "Content-Type: application/json" \
+              "${GATEWAY_URL}/api/controller/v2/job_templates/" \
+              -d "{
+                \"name\": \"Break Scenario\",
+                \"description\": \"Apply the break for scenario ${SCENARIO}\",
+                \"organization\": 1,
+                \"project\": ${PROJECT_ID},
+                \"playbook\": \"automation/ansible/playbooks/break-scenario-${SCENARIO}.yml\",
+                \"inventory\": 1,
+                \"job_type\": \"run\",
+                \"allow_simultaneous\": false,
+                \"extra_vars\": \"{\\\"namespace\\\": \\\"${NAMESPACE}\\\", \\\"aap_cr_name\\\": \\\"${AAP_CR_NAME}\\\"}\"
+              }" \
+              -o /tmp/resp.json -w "%{http_code}")
+            if ! echo "${HTTP}" | grep -qE "^2"; then
+              echo "ERROR creating job template (HTTP ${HTTP}):"; cat /tmp/resp.json; exit 1
+            fi
+            echo "Break Scenario job template created (HTTP ${HTTP})."
+          else
+            echo "Break Scenario job template already exists, skipping creation."
           fi
-          echo "Break Scenario job template created (HTTP ${HTTP})."
 
           JT_ID=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
             "${GATEWAY_URL}/api/controller/v2/job_templates/?name=Break+Scenario" \
