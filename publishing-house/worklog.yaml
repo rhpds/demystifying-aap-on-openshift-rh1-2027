@@ -3,6 +3,28 @@
 # Not a task tracker — the manifest tracks structured progress.
 
 entries:
+  - id: "2026-10-02-001"
+    timestamp: "2026-10-02T00:00:00Z"
+    author: "rlaroy"
+    status: open
+    type: summary
+    content: >
+      Session 2026-10-02: Addressed two unresolved content review rejections from
+      nstephan@redhat.com. Cut the lab from 6 scenarios to the 4 already fully developed
+      (Hub Storage, Gateway Login, Node Selector, ALIA Lightspeed), bringing total
+      duration to ~1.75 hours with buffer for intro/outro. Updated spec.yaml, design.md,
+      and module outlines to match; renamed ALIA to Scenario 4. Added framing across the
+      design doc and catalog_gap field clarifying that all scenarios are drawn from real
+      AAP customer support cases, not synthetic exercises — this addresses the
+      reviewer's Ansible/OpenShift balance concern. Marked both rejection reasons resolved
+      and resubmitted to Central API. Post-submission fixes: corrected Scenario 1 solution
+      storage class to ocs-external-storagecluster-cephfs; pulled upstream automation
+      fixes for job template creation and SA RBAC; updated Scenario 4 content and solution
+      throughout to reflect the revised symptom (ALIA icon present but unresponsive, not
+      missing); added alia_chat_ui.png screenshot to Step 2. Lab content is considered
+      complete and ready for review. Project is now queued for Content Review, Infra
+      Review, and Staging.
+
   - id: "2026-08-31-001"
     timestamp: "2026-08-31T00:00:00Z"
     author: "rl-rh"
