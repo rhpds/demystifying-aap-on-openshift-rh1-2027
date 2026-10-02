@@ -141,15 +141,19 @@ spec:
           echo "Project ID: ${PROJECT_ID}"
 
           echo "Waiting for project sync..."
+          SYNC_OK=0
           for i in $(seq 1 30); do
             STATUS=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
               "${GATEWAY_URL}/api/controller/v2/projects/${PROJECT_ID}/" \
               | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])")
             echo "  Status: ${STATUS}"
-            [ "${STATUS}" = "successful" ] && break
+            if [ "${STATUS}" = "successful" ]; then SYNC_OK=1; break; fi
             [ "${STATUS}" = "failed" ] && echo "Project sync failed!" && exit 1
             sleep 10
           done
+          if [ "${SYNC_OK}" = "0" ]; then
+            echo "Project sync timed out — AAP still reconciling. Will retry."; exit 1
+          fi
 
           # ----------------------------------------------------------------
           # 3. Create break job template for this scenario
