@@ -67,24 +67,28 @@ spec:
           #    AAP init occasionally skips this on slower scenarios (e.g. ALIA).
           #    Without it every job stays pending forever.
           # ----------------------------------------------------------------
-          IG_COUNT=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
-            "${GATEWAY_URL}/api/controller/v2/instance_groups/?name=controlplane" \
-            | python3 -c "import sys,json; print(json.load(sys.stdin)['count'])")
-          if [ "${IG_COUNT}" = "0" ]; then
-            echo "controlplane instance group missing — creating..."
-            HTTP=$(curl -sk -X POST \
-              -u "admin:${ADMIN_PASSWORD}" \
-              -H "Content-Type: application/json" \
-              "${GATEWAY_URL}/api/controller/v2/instance_groups/" \
-              -d '{"name":"controlplane","policy_instance_percentage":100,"policy_instance_minimum":0}' \
-              -o /tmp/resp.json -w "%{http_code}")
-            if ! echo "${HTTP}" | grep -qE "^2"; then
-              echo "ERROR creating instance group (HTTP ${HTTP}):"; cat /tmp/resp.json; exit 1
+          for IG_NAME in controlplane default; do
+            IG_PAYLOAD='{"name":"controlplane","policy_instance_percentage":100,"policy_instance_minimum":0}'
+            [ "${IG_NAME}" = "default" ] && IG_PAYLOAD='{"name":"default","is_container_group":true}'
+            IG_COUNT=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
+              "${GATEWAY_URL}/api/controller/v2/instance_groups/?name=${IG_NAME}" \
+              | python3 -c "import sys,json; print(json.load(sys.stdin)['count'])")
+            if [ "${IG_COUNT}" = "0" ]; then
+              echo "${IG_NAME} instance group missing — creating..."
+              HTTP=$(curl -sk -X POST \
+                -u "admin:${ADMIN_PASSWORD}" \
+                -H "Content-Type: application/json" \
+                "${GATEWAY_URL}/api/controller/v2/instance_groups/" \
+                -d "${IG_PAYLOAD}" \
+                -o /tmp/resp.json -w "%{http_code}")
+              if ! echo "${HTTP}" | grep -qE "^2"; then
+                echo "ERROR creating ${IG_NAME} instance group (HTTP ${HTTP}):"; cat /tmp/resp.json; exit 1
+              fi
+              echo "${IG_NAME} instance group created (HTTP ${HTTP})."
+            else
+              echo "${IG_NAME} instance group exists."
             fi
-            echo "controlplane instance group created (HTTP ${HTTP})."
-          else
-            echo "controlplane instance group exists."
-          fi
+          done
 
           # ----------------------------------------------------------------
           # 1. Register namespace-admin SA as OpenShift credential
