@@ -1,4 +1,4 @@
-= 💡 Solution: Scenario 3 - Node selector issue
+= 💡 Solution: Scenario 3 - Automation Controller
 
 This page provides the detailed solution for the issue presented in Scenario 3. Review these steps after you have attempted the diagnosis and resolution yourself.
 

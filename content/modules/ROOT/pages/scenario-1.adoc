@@ -1,4 +1,4 @@
-= Scenario 1: Automation Hub storage issue
+= Scenario 1: Automation Hub
 
 [cols="3",options="header"]
 |===

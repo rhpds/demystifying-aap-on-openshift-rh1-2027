@@ -1,4 +1,4 @@
-= Scenario 3: Node selector issue
+= Scenario 3: Automation Controller
 
 [cols="3",options="header"]
 |===
@@ -58,7 +58,7 @@ Identify pods that are not reaching a `Running` state. Click on each failing pod
 
 Once you have identified the issue, apply the fix through the OpenShift Console.
 
-Refer to the solution page if needed: xref:scenario-3-solution.adoc[Solution: Node selector issue]
+Refer to the solution page if needed: xref:scenario-3-solution.adoc[Solution: Automation Controller]
 
 === Step 4: Verify
 

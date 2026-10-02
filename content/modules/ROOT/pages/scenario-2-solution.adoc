@@ -1,4 +1,4 @@
-= 💡 Solution: Scenario 2 - Gateway login issues
+= 💡 Solution: Scenario 2 - Automation Gateway
 
 This page provides the detailed solutions for the issues presented in Scenario 2. Review these steps after you have attempted the diagnosis and resolution yourself.
 
