@@ -72,7 +72,7 @@ spec:
           echo "Credential type ID: ${CRED_TYPE_ID}"
 
           echo "Creating namespace-admin credential..."
-          curl -sk -X POST \
+          HTTP=$(curl -sk -X POST \
             -u "admin:${ADMIN_PASSWORD}" \
             -H "Content-Type: application/json" \
             "${GATEWAY_URL}/api/controller/v2/credentials/" \
@@ -86,18 +86,23 @@ spec:
                 \"bearer_token\": \"${SA_TOKEN}\",
                 \"verify_ssl\": false
               }
-            }" > /dev/null
-          echo "Credential registered."
+            }" \
+            -o /tmp/resp.json -w "%{http_code}")
+          if ! echo "${HTTP}" | grep -qE "^(2|409)"; then
+            echo "ERROR creating credential (HTTP ${HTTP}):"; cat /tmp/resp.json; exit 1
+          fi
+          echo "Credential registered (HTTP ${HTTP})."
 
           CRED_ID=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
             "${GATEWAY_URL}/api/controller/v2/credentials/?name=Namespace+Admin+SA" \
             | python3 -c "import sys,json; print(json.load(sys.stdin)['results'][0]['id'])")
+          echo "Credential ID: ${CRED_ID}"
 
           # ----------------------------------------------------------------
           # 2. Create project
           # ----------------------------------------------------------------
           echo "Creating AAP Troubleshooting project..."
-          curl -sk -X POST \
+          HTTP=$(curl -sk -X POST \
             -u "admin:${ADMIN_PASSWORD}" \
             -H "Content-Type: application/json" \
             "${GATEWAY_URL}/api/controller/v2/projects/" \
@@ -109,7 +114,12 @@ spec:
               "scm_url": "https://github.com/rhpds/demystifying-aap-on-openshift-rh1-2027.git",
               "scm_branch": "main",
               "scm_update_on_launch": false
-            }' > /dev/null
+            }' \
+            -o /tmp/resp.json -w "%{http_code}")
+          if ! echo "${HTTP}" | grep -qE "^(2|409)"; then
+            echo "ERROR creating project (HTTP ${HTTP}):"; cat /tmp/resp.json; exit 1
+          fi
+          echo "Project created/exists (HTTP ${HTTP})."
 
           PROJECT_ID=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
             "${GATEWAY_URL}/api/controller/v2/projects/?name=AAP+Troubleshooting+Demo" \
@@ -131,7 +141,7 @@ spec:
           # 3. Create break job template for this scenario
           # ----------------------------------------------------------------
           echo "Creating Break Scenario ${SCENARIO} job template..."
-          curl -sk -X POST \
+          HTTP=$(curl -sk -X POST \
             -u "admin:${ADMIN_PASSWORD}" \
             -H "Content-Type: application/json" \
             "${GATEWAY_URL}/api/controller/v2/job_templates/" \
@@ -140,23 +150,34 @@ spec:
               \"description\": \"Apply the break for scenario ${SCENARIO}\",
               \"organization\": 1,
               \"project\": ${PROJECT_ID},
-              \"playbook\": \"playbooks/break-scenario-${SCENARIO}.yml\",
+              \"playbook\": \"automation/ansible/playbooks/break-scenario-${SCENARIO}.yml\",
               \"inventory\": 1,
               \"job_type\": \"run\",
               \"allow_simultaneous\": false,
               \"extra_vars\": \"{\\\"namespace\\\": \\\"${NAMESPACE}\\\", \\\"aap_cr_name\\\": \\\"${AAP_CR_NAME}\\\"}\"
-            }" > /dev/null
+            }" \
+            -o /tmp/resp.json -w "%{http_code}")
+          if ! echo "${HTTP}" | grep -qE "^(2|409)"; then
+            echo "ERROR creating job template (HTTP ${HTTP}):"; cat /tmp/resp.json; exit 1
+          fi
+          echo "Break Scenario job template created (HTTP ${HTTP})."
 
           JT_ID=$(curl -sk -u "admin:${ADMIN_PASSWORD}" \
             "${GATEWAY_URL}/api/controller/v2/job_templates/?name=Break+Scenario" \
             | python3 -c "import sys,json; print(json.load(sys.stdin)['results'][0]['id'])")
+          echo "Job template ID: ${JT_ID}"
 
           echo "Attaching Namespace Admin SA credential to job template..."
-          curl -sk -X POST \
+          HTTP=$(curl -sk -X POST \
             -u "admin:${ADMIN_PASSWORD}" \
             -H "Content-Type: application/json" \
             "${GATEWAY_URL}/api/controller/v2/job_templates/${JT_ID}/credentials/" \
-            -d "{\"id\": ${CRED_ID}}" > /dev/null
+            -d "{\"id\": ${CRED_ID}}" \
+            -o /tmp/resp.json -w "%{http_code}")
+          if ! echo "${HTTP}" | grep -qE "^2"; then
+            echo "ERROR attaching credential (HTTP ${HTTP}):"; cat /tmp/resp.json; exit 1
+          fi
+          echo "Credential attached (HTTP ${HTTP})."
 
           echo "AAP Controller configured successfully."
           echo "  Project: AAP Troubleshooting Demo"
