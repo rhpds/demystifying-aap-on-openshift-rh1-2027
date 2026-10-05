@@ -1,15 +1,62 @@
 ---
 # HEALTHCHECK — Quick environment readiness check
-# Runs post-provisioning to verify the lab environment is functional.
+# Verifies OCP API, Keycloak SSO, and AAP gateways for all 4 scenarios.
 # Should complete in under 60 seconds.
-#
-# Exit 0 = healthy, non-zero = unhealthy.
 
-- name: "Environment Health Check"
+- name: Environment Health Check
   hosts: localhost
   connection: local
   gather_facts: false
+
+  vars:
+    _token: "{{ lookup('file', '/var/run/secrets/kubernetes.io/serviceaccount/token') }}"
+
   tasks:
-    - name: "TODO: Implement health checks"
+    - name: Read pod namespace
+      ansible.builtin.slurp:
+        src: /var/run/secrets/kubernetes.io/serviceaccount/namespace
+      register: r_ns
+
+    - name: Derive username from namespace
+      ansible.builtin.set_fact:
+        username: >-
+          {{ 'user-' + (r_ns.content | b64decode | trim | regex_replace('^showroom-', ''))
+             if (r_ns.content | b64decode | trim).startswith('showroom-')
+             else (r_ns.content | b64decode | trim | regex_replace('-scenario-[0-9]+$', '')) }}
+
+    - name: Get cluster ingress domain from OCP API
+      ansible.builtin.uri:
+        url: "https://kubernetes.default.svc/apis/config.openshift.io/v1/ingresses/cluster"
+        headers:
+          Authorization: "Bearer {{ _token }}"
+        validate_certs: false
+        status_code: 200
+        timeout: 10
+      register: r_ingress
+
+    - name: Set ingress domain
+      ansible.builtin.set_fact:
+        ingress_domain: "{{ r_ingress.json.spec.domain }}"
+
+    - name: "Check: OCP API reachable"
       ansible.builtin.debug:
-        msg: "Replace this task with checks that verify the environment is ready"
+        msg: "OCP API OK — ingress domain: {{ ingress_domain }}"
+
+    - name: "Check: Keycloak SSO responding"
+      ansible.builtin.uri:
+        url: "https://sso.{{ ingress_domain }}/realms/master"
+        validate_certs: false
+        status_code: 200
+        timeout: 15
+
+    - name: "Check: AAP gateway responding for each scenario"
+      ansible.builtin.uri:
+        url: "https://{{ username }}-aap-{{ username }}-scenario-{{ item }}.{{ ingress_domain }}/api/controller/v2/ping/"
+        validate_certs: false
+        status_code: [200, 401]
+        timeout: 15
+      loop: "{{ range(1, 5) | list }}"
+
+    - name: Report all checks passed
+      ansible.builtin.debug:
+        msg: "Health check passed — OCP API, Keycloak SSO, and AAP gateways (scenarios 1-4) all responding."
