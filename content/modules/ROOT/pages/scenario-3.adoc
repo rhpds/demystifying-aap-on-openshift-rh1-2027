@@ -3,7 +3,7 @@
 [cols="3",options="header"]
 |===
 | Difficulty | Components | Break Type
-| Easy / Medium | Gateway | One issue
+| Easy / Medium | Automation Controller | One issue
 |===
 
 == Objectives

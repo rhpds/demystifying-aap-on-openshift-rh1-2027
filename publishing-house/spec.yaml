@@ -29,27 +29,27 @@ spec:
   - id: module-01
     title: Welcome and Lab Credentials
     duration_min: 10
-    status: not_started
+    status: complete
   - id: module-02
     title: 'Scenario 1: Automation Hub Storage Issue'
     duration_min: 20
-    status: not_started
+    status: complete
   - id: module-03
     title: 'Scenario 2: Gateway and Controller Login Issues'
     duration_min: 25
-    status: not_started
+    status: complete
   - id: module-04
     title: 'Scenario 3: Node Selector and Resource Issues'
     duration_min: 20
-    status: not_started
+    status: complete
   - id: module-05
     title: 'Scenario 4: ALIA — Ansible Lightspeed Issues'
     duration_min: 30
-    status: not_started
+    status: complete
   - id: module-06
     title: Conclusion
     duration_min: 5
-    status: not_started
+    status: complete
   environment:
     platform: ocp
     topology: shared-cluster

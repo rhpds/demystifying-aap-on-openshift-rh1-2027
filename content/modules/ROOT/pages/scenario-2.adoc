@@ -3,7 +3,7 @@
 [cols="3",options="header"]
 |===
 | Difficulty | Components | Break Type
-| Hard | Automation Gateway
+| Hard | Automation Gateway | Credential misconfiguration
 |===
 
 == Objectives
