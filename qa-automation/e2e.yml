@@ -1,13 +1,21 @@
 ---
-# E2E — End-to-end test
-# Runs all module solve + validate sequences to verify the full lab
-# works from start to finish without manual intervention.
+# E2E — End-to-end lab validation
+# Runs solve → validate for each scenario in sequence.
+# Intended for load testing and automated environment verification.
 
-- name: "End-to-End Test"
+- name: End-to-End Lab Validation
   hosts: localhost
   connection: local
   gather_facts: false
   tasks:
-    - name: "TODO: Implement end-to-end test sequence"
-      ansible.builtin.debug:
-        msg: "Replace this task with your e2e test implementation"
+    - name: "Scenario 1: Automation Hub Storage"
+      ansible.builtin.include_tasks: module-01.yml
+
+    - name: "Scenario 2: Gateway and Controller Login"
+      ansible.builtin.include_tasks: module-02.yml
+
+    - name: "Scenario 3: Node Selector and Resource Issues"
+      ansible.builtin.include_tasks: module-03.yml
+
+    - name: "Scenario 4: ALIA Lightspeed"
+      ansible.builtin.include_tasks: module-04.yml

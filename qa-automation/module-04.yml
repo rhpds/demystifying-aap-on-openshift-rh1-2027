@@ -1,0 +1,27 @@
+---
+# Module 04 — ALIA Lightspeed
+# Solves: patches chatbot-configuration-secret with correct model name
+# Wait: Lightspeed component reconciliation
+# Validates: chatbot secret has correct model, Lightspeed pod Running
+
+- name: "Module 04 — solve: restore correct ALIA model"
+  ansible.builtin.command:
+    argv:
+      - ansible-playbook
+      - "{{ playbook_dir }}/../runtime-automation/scenario-4/solve.yml"
+  register: r_solve_04
+
+- name: "Module 04 — wait: Lightspeed reconciliation"
+  ansible.builtin.pause:
+    seconds: 60
+
+- name: "Module 04 — validate: ALIA configuration"
+  ansible.builtin.command:
+    argv:
+      - ansible-playbook
+      - "{{ playbook_dir }}/../runtime-automation/scenario-4/validation.yml"
+  register: r_validate_04
+
+- name: "Module 04 — result"
+  ansible.builtin.debug:
+    msg: "Scenario 4 passed."

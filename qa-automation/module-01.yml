@@ -1,0 +1,27 @@
+---
+# Module 01 — Automation Hub Storage
+# Solves: sets Hub file_storage_storage_class to RWX CephFS
+# Wait: Hub operator reconciliation takes ~5 minutes
+# Validates: storage class set, PVC Bound, Hub pods Running
+
+- name: "Module 01 — solve: fix Hub storage class"
+  ansible.builtin.command:
+    argv:
+      - ansible-playbook
+      - "{{ playbook_dir }}/../runtime-automation/scenario-1/solve.yml"
+  register: r_solve_01
+
+- name: "Module 01 — wait: Hub operator reconciliation"
+  ansible.builtin.pause:
+    seconds: 300
+
+- name: "Module 01 — validate: Hub storage"
+  ansible.builtin.command:
+    argv:
+      - ansible-playbook
+      - "{{ playbook_dir }}/../runtime-automation/scenario-1/validation.yml"
+  register: r_validate_01
+
+- name: "Module 01 — result"
+  ansible.builtin.debug:
+    msg: "Scenario 1 passed."

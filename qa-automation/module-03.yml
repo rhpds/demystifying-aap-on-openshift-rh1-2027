@@ -1,0 +1,28 @@
+---
+# Module 03 — Node Selector and Resource Issues
+# Solves: removes invalid database node_selector from AAP CR,
+#         deletes stuck postgres pod so it reschedules
+# Wait: postgres pod reschedule and AAP reconciliation
+# Validates: postgres pod Running, AAP CR database node_selector cleared
+
+- name: "Module 03 — solve: remove invalid node selector"
+  ansible.builtin.command:
+    argv:
+      - ansible-playbook
+      - "{{ playbook_dir }}/../runtime-automation/scenario-3/solve.yml"
+  register: r_solve_03
+
+- name: "Module 03 — wait: postgres reschedule"
+  ansible.builtin.pause:
+    seconds: 120
+
+- name: "Module 03 — validate: node selector cleared"
+  ansible.builtin.command:
+    argv:
+      - ansible-playbook
+      - "{{ playbook_dir }}/../runtime-automation/scenario-3/validation.yml"
+  register: r_validate_03
+
+- name: "Module 03 — result"
+  ansible.builtin.debug:
+    msg: "Scenario 3 passed."

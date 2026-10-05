@@ -1,5 +1,5 @@
 ---
-- name: Solve Scenario 06 — ALIA Lightspeed Configuration
+- name: Solve Scenario 04 — ALIA Lightspeed Configuration
   hosts: localhost
   connection: local
   gather_facts: false

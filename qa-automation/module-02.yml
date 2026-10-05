@@ -1,0 +1,28 @@
+---
+# Module 02 — Gateway and Controller Login
+# Solves: resets AAP admin password via aap-gateway-manage, restores
+#         postgres-15 Service, scales gateway operator back to 1
+# Wait: Gateway operator restart + postgres Service recreation
+# Validates: postgres-15 Service exists, Gateway pods Running
+
+- name: "Module 02 — solve: restore gateway password and postgres service"
+  ansible.builtin.command:
+    argv:
+      - ansible-playbook
+      - "{{ playbook_dir }}/../runtime-automation/scenario-2/solve.yml"
+  register: r_solve_02
+
+- name: "Module 02 — wait: gateway operator restart"
+  ansible.builtin.pause:
+    seconds: 120
+
+- name: "Module 02 — validate: gateway connectivity"
+  ansible.builtin.command:
+    argv:
+      - ansible-playbook
+      - "{{ playbook_dir }}/../runtime-automation/scenario-2/validation.yml"
+  register: r_validate_02
+
+- name: "Module 02 — result"
+  ansible.builtin.debug:
+    msg: "Scenario 2 passed."
