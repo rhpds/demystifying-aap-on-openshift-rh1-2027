@@ -1,6 +1,6 @@
 ## Brief Overview
 
-This orientation module introduces students to the Demystifying AAP on OpenShift lab environment. Students learn how the lab is structured around a break-and-fix model: each namespace contains six pre-broken AAP instances, one per scenario. Showroom tabs provide direct browser access to each scenario's AAP UI and the shared OpenShift Console. No hands-on troubleshooting occurs in this module — it exists solely to orient students before they begin the scenarios.
+This orientation module introduces students to the Demystifying AAP on OpenShift lab environment. Students learn how the lab is structured around a break-and-fix model: each namespace contains four pre-broken AAP instances, one per scenario. Showroom tabs provide direct browser access to each scenario's AAP UI and the shared OpenShift Console. No hands-on troubleshooting occurs in this module — it exists solely to orient students before they begin the scenarios.
 
 ## Audience and Time
 
@@ -10,9 +10,9 @@ This orientation module introduces students to the Demystifying AAP on OpenShift
 
 ## Learning Objectives
 
-- Locate and use the Showroom tabs to access each scenario's AAP UI and the OpenShift Console
+- Identify the Showroom tabs providing access to each scenario's AAP UI and the OpenShift Console
 - Identify the lab credential sets for AAP (admin / {password}) and OpenShift ({user} / {password})
-- Understand the break-and-fix workflow: each scenario has its own pre-broken AAP instance, a Break Scenario job template (where applicable), and Solve/Validate buttons
+- Understand the break-and-fix workflow: each scenario has its own pre-broken AAP instance, a Break Scenario job template (where applicable), and Check Your Work (Solve and Validate) buttons in the lab guide
 
 ## Lab Structure
 
@@ -24,7 +24,7 @@ This orientation module introduces students to the Demystifying AAP on OpenShift
 
 ## Key Takeaways
 
-- Each of the six scenarios runs in an isolated namespace with its own pre-broken AAP deployment
+- Each of the four scenarios runs in an isolated namespace with its own pre-broken AAP deployment
 - Showroom tabs eliminate the need for copy-pasting URLs; all scenario UIs are one click away
 - AAP credentials follow the pattern `admin / {password}`; OpenShift credentials are `{user} / {password}`
 - No validation gate exists for this module — students proceed directly to Scenario 1
