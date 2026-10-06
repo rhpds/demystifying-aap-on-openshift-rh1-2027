@@ -1,10 +1,12 @@
 ---
-namespace: "<your_namespace>"
-name: "<your_collection_name>"
+namespace: rhpds
+name: demystifying_aap
 version: "1.0.0"
 readme: README.md
 authors:
-  - "<Your Name> <you@example.com>"
+  - "Ryan LaRoy <rlaroy@redhat.com>"
+  - "Max Mitschke <mmitschk@redhat.com>"
+  - "Ricardo Garcia Cavero <rgarciac@redhat.com>"
 description: "Starter collection for this project's custom Ansible automation."
 license: []
-repository: "<https://github.com/rhpds/your-project-repo>"
+repository: "https://github.com/rhpds/demystifying-aap-on-openshift-rh1-2027"
