@@ -2,7 +2,7 @@
 site:
   title: Demystifying Ansible Automation Platform on OpenShift Container Platform Lab
   url: https://rhpds.github.io/demystifying-aap-on-ocp-showroom
-  start_page: modules::index.adoc
+  start_page: modules::module-01-welcome.adoc
 
 content:
   sources:

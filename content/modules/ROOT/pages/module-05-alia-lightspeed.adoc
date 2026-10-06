@@ -90,7 +90,7 @@ Navigate to *Workloads → Secrets* in the OpenShift Console to inspect the chat
 
 Once you have identified the misconfiguration, apply the fix through the OpenShift Console.
 
-Refer to the solution page if needed: xref:scenario-4-solution.adoc[Solution: ALIA Lightspeed issues]
+Refer to the solution page if needed: xref:module-05-alia-lightspeed-solution.adoc[Solution: ALIA Lightspeed issues]
 
 === Step 6: Verify
 

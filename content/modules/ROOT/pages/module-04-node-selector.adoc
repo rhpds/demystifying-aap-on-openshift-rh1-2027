@@ -58,7 +58,7 @@ Identify pods that are not reaching a `Running` state. Click on each failing pod
 
 Once you have identified the issue, apply the fix through the OpenShift Console.
 
-Refer to the solution page if needed: xref:scenario-3-solution.adoc[Solution: Automation Controller]
+Refer to the solution page if needed: xref:module-04-node-selector-solution.adoc[Solution: Automation Controller]
 
 === Step 4: Verify
 

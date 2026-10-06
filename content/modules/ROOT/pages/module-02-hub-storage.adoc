@@ -64,7 +64,7 @@ Navigate to *Storage → PersistentVolumeClaims* and inspect the status of the H
 
 Once you have identified the root cause, apply the fix through the OpenShift Console.
 
-Refer to the solution page if you need guidance: xref:scenario-1-solution.adoc[Solution: Automation Hub storage issue]
+Refer to the solution page if you need guidance: xref:module-02-hub-storage-solution.adoc[Solution: Automation Hub storage issue]
 
 === Step 4: Verify
 

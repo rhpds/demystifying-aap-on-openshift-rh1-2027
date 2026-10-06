@@ -62,7 +62,7 @@ Identify any failing pods and click through to review their *Logs* and *Events* 
 
 Once you have identified the issue, apply the fix.
 
-Refer to the solution page if needed: xref:scenario-2-solution.adoc[Solution: Automation Gateway]
+Refer to the solution page if needed: xref:module-03-gateway-login-solution.adoc[Solution: Automation Gateway]
 
 === Step 5: Verify
 
