@@ -1,0 +1,4 @@
+= Conclusion
+:page-aliases: conclusion.adoc
+
+include::module-06-conclusion.adoc[]
