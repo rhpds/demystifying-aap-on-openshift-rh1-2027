@@ -4,7 +4,7 @@ project:
   content_type: lab
   deployment_mode: rhdp_published
   initiative_key: rh1_2027
-  showroom_type: zero_touch
+  showroom_type: classic
   intake_type: migration
   automation_type: both
   description: Hands on lab providing attendees with functioning AAP clusters, letting
