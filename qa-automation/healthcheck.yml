@@ -8,6 +8,10 @@
   connection: local
   gather_facts: false
 
+  module_defaults:
+    group/kubernetes.core.k8s:
+      kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+
   vars:
     _token: "{{ lookup('file', '/var/run/secrets/kubernetes.io/serviceaccount/token') }}"
 
@@ -24,19 +28,9 @@
              if (r_ns.content | b64decode | trim).startswith('showroom-')
              else (r_ns.content | b64decode | trim | regex_replace('-scenario-[0-9]+$', '')) }}
 
-    - name: Get cluster ingress domain from OCP API
-      ansible.builtin.uri:
-        url: "https://kubernetes.default.svc/apis/config.openshift.io/v1/ingresses/cluster"
-        headers:
-          Authorization: "Bearer {{ _token }}"
-        validate_certs: false
-        status_code: 200
-        timeout: 10
-      register: r_ingress
-
-    - name: Set ingress domain
+    - name: Set ingress domain from Showroom env var
       ansible.builtin.set_fact:
-        ingress_domain: "{{ r_ingress.json.spec.domain }}"
+        ingress_domain: "{{ lookup('env', 'openshift_cluster_ingress_domain') }}"
 
     - name: "Check: OCP API reachable"
       ansible.builtin.debug:

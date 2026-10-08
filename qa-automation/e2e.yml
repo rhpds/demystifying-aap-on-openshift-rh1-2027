@@ -2,11 +2,24 @@
 # E2E — End-to-end lab validation
 # Runs solve → validate for each scenario in sequence.
 # Intended for load testing and automated environment verification.
+#
+# Requires ocp4_workload_showroom_runtime_automation_enable: true
+# and ocp4_workload_showroom_runtime_automation_cluster_admin: true
+# in AgnosticV tenant common.yaml to populate k8s_kubeconfig.
 
 - name: End-to-End Lab Validation
   hosts: localhost
   connection: local
   gather_facts: false
+
+  module_defaults:
+    group/kubernetes.core.k8s:
+      kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+
+  environment:
+    KUBECONFIG: "{{ k8s_kubeconfig | default('') }}"
+    K8S_AUTH_KUBECONFIG: "{{ k8s_kubeconfig | default('') }}"
+
   tasks:
     - name: "Scenario 1: Automation Hub Storage"
       ansible.builtin.include_tasks: module-01.yml
