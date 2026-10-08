@@ -30,7 +30,7 @@
 
     - name: Set ingress domain from Showroom env var
       ansible.builtin.set_fact:
-        ingress_domain: "{{ lookup('env', 'openshift_cluster_ingress_domain') }}"
+        ingress_domain: "{{ lookup('env', 'openshift_apps_domain') }}"
 
     - name: "Check: OCP API reachable"
       ansible.builtin.debug:
