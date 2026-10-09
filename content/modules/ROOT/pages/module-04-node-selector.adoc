@@ -1,4 +1,5 @@
 = Scenario 3: Automation Controller
+:page-aliases: scenario-3.adoc
 
 [cols="3",options="header"]
 |===

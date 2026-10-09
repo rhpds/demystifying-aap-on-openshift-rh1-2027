@@ -1,4 +1,5 @@
 = Scenario 4: ALIA — Ansible Lightspeed issues
+:page-aliases: scenario-4.adoc
 
 [cols="3",options="header"]
 |===

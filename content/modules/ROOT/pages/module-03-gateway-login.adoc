@@ -1,4 +1,5 @@
 = Scenario 2: Automation Gateway
+:page-aliases: scenario-2.adoc
 
 [cols="3",options="header"]
 |===
