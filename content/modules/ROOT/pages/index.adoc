@@ -1,4 +1,3 @@
 = Welcome and Lab Credentials
-:page-aliases: index.adoc
 
 include::module-01-welcome.adoc[]
