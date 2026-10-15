@@ -127,7 +127,7 @@ The provisioning automation must:
 
 ## Infrastructure Requirements
 
-- **Cloud provider:** CNV
+- **Cloud provider:** AWS
 - **Cluster type:** Multinode OCP (shared cluster)
 - **OCP version:** 4.20 minimum
 - **Topology:** Shared-cluster, 60 max concurrent users

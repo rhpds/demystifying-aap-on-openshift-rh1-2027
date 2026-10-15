@@ -53,7 +53,7 @@ spec:
   environment:
     platform: ocp
     topology: shared-cluster
-    cloud_provider: cnv
+    cloud_provider: aws
     max_concurrent_users: 60
     ocp_version: '4.20'
     cluster_type: multinode
