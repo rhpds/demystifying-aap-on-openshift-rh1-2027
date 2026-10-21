@@ -5,7 +5,11 @@
   gather_facts: false
 
   vars:
-    _token: "{{ lookup('file', '/var/run/secrets/kubernetes.io/serviceaccount/token') }}"
+    _kc_raw: "{{ (lookup('file', k8s_kubeconfig) | from_yaml) if (k8s_kubeconfig | default('')) != '' else {} }}"
+    _token: >-
+      {{ _kc_raw.users[0].user.token
+         if (_kc_raw and (_kc_raw.users | default([])) | length > 0)
+         else lookup('file', '/var/run/secrets/kubernetes.io/serviceaccount/token') }}
     _pg_label: "app.kubernetes.io%2Fcomponent%3Ddatabase%2Capp.kubernetes.io%2Fname%3Dpostgres-15"
 
   tasks:
