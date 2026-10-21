@@ -1,5 +1,5 @@
 ---
-- name: Validate Module 03 — Database Node Selector
+- name: Validate Scenario 03 — Database Node Selector
   hosts: localhost
   connection: local
   gather_facts: false

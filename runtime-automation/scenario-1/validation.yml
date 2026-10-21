@@ -1,5 +1,5 @@
 ---
-- name: Validate Module 01 — Automation Hub Storage
+- name: Validate Scenario 01 — Automation Hub Storage
   hosts: localhost
   connection: local
   gather_facts: false

@@ -1,5 +1,5 @@
 ---
-- name: Validate Module 02 — Gateway Connectivity
+- name: Validate Scenario 02 — Gateway Connectivity
   hosts: localhost
   connection: local
   gather_facts: false

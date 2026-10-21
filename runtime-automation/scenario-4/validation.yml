@@ -1,5 +1,5 @@
 ---
-- name: Validate Module 06 — ALIA Lightspeed Configuration
+- name: Validate Scenario 04 — ALIA Lightspeed Configuration
   hosts: localhost
   connection: local
   gather_facts: false

@@ -1,5 +1,5 @@
 ---
-- name: Validate Module 05 — Hub File Storage Size
+- name: Validate Scenario 06 — Hub File Storage Size
   hosts: localhost
   connection: local
   gather_facts: false

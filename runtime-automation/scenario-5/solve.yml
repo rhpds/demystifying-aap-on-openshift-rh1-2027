@@ -1,5 +1,5 @@
 ---
-- name: Solve Module 04 — Execution Environment Credentials
+- name: Solve Scenario 05 — Execution Environment Credentials
   hosts: localhost
   connection: local
   gather_facts: false
@@ -98,7 +98,7 @@
       ansible.builtin.copy:
         content: |
           [INFO]
-          [OK] Module 04 solved
+          [OK] Scenario 05 solved
 
           Fixed:
           - Reassigned all job templates using RH1-EE1 to Default execution environment

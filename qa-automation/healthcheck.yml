@@ -1,6 +1,7 @@
 ---
 # HEALTHCHECK — Quick environment readiness check
-# Verifies OCP API, Keycloak SSO, and AAP gateways for all 4 scenarios.
+# Verifies OCP API, Keycloak SSO, AAP gateways for all 4 scenarios, the
+# ALIA/Lightspeed MaaS LLM endpoint (Scenario 4), and the Showroom pod.
 # Should complete in under 60 seconds.
 
 - name: Environment Health Check
@@ -14,12 +15,22 @@
 
   vars:
     _token: "{{ lookup('file', '/var/run/secrets/kubernetes.io/serviceaccount/token') }}"
+    # External MaaS LLM endpoint backing ALIA/Lightspeed (Scenario 4).
+    # Defaults to the value baked into the AAP chatbot secret; override via env
+    # (alia_llm_endpoint) if the tenant points at a different MaaS endpoint.
+    alia_llm_endpoint: >-
+      {{ lookup('env', 'alia_llm_endpoint')
+         | default('https://litellm-prod.apps.maas.redhatworkshops.io/v1', true) }}
 
   tasks:
     - name: Read pod namespace
       ansible.builtin.slurp:
         src: /var/run/secrets/kubernetes.io/serviceaccount/namespace
       register: r_ns
+
+    - name: Set pod namespace fact
+      ansible.builtin.set_fact:
+        pod_namespace: "{{ r_ns.content | b64decode | trim }}"
 
     - name: Derive username from namespace
       ansible.builtin.set_fact:
@@ -51,6 +62,35 @@
         timeout: 15
       loop: "{{ range(1, 5) | list }}"
 
+    - name: "Check: ALIA / Lightspeed MaaS LLM endpoint reachable (Scenario 4)"
+      ansible.builtin.uri:
+        url: "{{ alia_llm_endpoint }}"
+        method: GET
+        validate_certs: false
+        # Unauthenticated probe: endpoint is up if it answers, even with 401/403/404.
+        status_code: [200, 401, 403, 404]
+        timeout: 15
+
+    - name: "Check: list pods in Showroom namespace"
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Pod
+        namespace: "{{ pod_namespace }}"
+      register: r_showroom_pods
+
+    - name: "Check: a Showroom pod is Running"
+      ansible.builtin.assert:
+        that:
+          - >-
+            r_showroom_pods.resources
+            | selectattr('metadata.name', 'search', 'showroom')
+            | selectattr('status.phase', 'equalto', 'Running')
+            | list | length > 0
+        fail_msg: "No Running Showroom pod found in namespace {{ pod_namespace }}"
+        success_msg: "Showroom pod is Running in namespace {{ pod_namespace }}"
+
     - name: Report all checks passed
       ansible.builtin.debug:
-        msg: "Health check passed — OCP API, Keycloak SSO, and AAP gateways (scenarios 1-4) all responding."
+        msg: >-
+          Health check passed — OCP API, Keycloak SSO, AAP gateways (scenarios 1-4),
+          ALIA/Lightspeed MaaS LLM endpoint, and the Showroom pod all responding.

@@ -1,5 +1,5 @@
 ---
-- name: Validate Module 04 — Execution Environment Credentials
+- name: Validate Scenario 05 — Execution Environment Credentials
   hosts: localhost
   connection: local
   gather_facts: false

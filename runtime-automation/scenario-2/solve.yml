@@ -1,5 +1,5 @@
 ---
-- name: Solve Module 02 — Gateway Connectivity
+- name: Solve Scenario 02 — Gateway Connectivity
   hosts: localhost
   connection: local
   gather_facts: false
@@ -124,7 +124,7 @@
       ansible.builtin.copy:
         content: |
           [INFO]
-          [OK] Module 02 solved
+          [OK] Scenario 02 solved
 
           Fixed:
           - Scaled aap-gateway-operator-controller-manager back to 1 replica

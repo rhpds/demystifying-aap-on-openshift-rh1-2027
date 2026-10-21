@@ -73,7 +73,7 @@ spec:
     non_ga_products: []
     non_ga_access_plan: ''
     external_services:
-    - MaaS LLM endpoint (ALIA/Lightspeed, Scenario 6)
+    - MaaS LLM endpoint (ALIA/Lightspeed, Scenario 4)
     gpu_nodes: 0
     gpu_type: ''
   duration_hours: 1.75
@@ -115,7 +115,7 @@ approval_checklist:
     module_summaries:
     - title: Welcome and Lab Credentials
       overview: Orientation module explaining the break-and-fix lab structure, student
-        namespace layout, and credential access for all six AAP instances and the
+        namespace layout, and credential access for all four AAP instances and the
         OpenShift Console.
     - title: 'Scenario 1: Automation Hub Storage Issue'
       overview: Students diagnose Automation Hub pods stuck Pending due to a ReadWriteOnly
@@ -133,7 +133,7 @@ approval_checklist:
         configured in the chatbot secret, then restore the correct model and force
         reconciliation by restarting the Lightspeed operator and API pods.
     - title: Conclusion
-      overview: Wrap-up summarizing the six scenarios and skills practiced, with links
+      overview: Wrap-up summarizing the four scenarios and skills practiced, with links
         to AAP and OCP documentation.
     rcars_overlap_pct: 44
     rcars_top_matches:
