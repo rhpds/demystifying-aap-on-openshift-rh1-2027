@@ -15,8 +15,16 @@
 
     - name: Set namespace and CR name facts
       ansible.builtin.set_fact:
-        current_namespace: "{{ r_ns.content | b64decode | trim }}"
-        aap_cr_name: "{{ r_ns.content | b64decode | trim | regex_replace('-scenario-[0-9]+$', '') }}-aap"
+        _raw_ns: "{{ r_ns.content | b64decode | trim }}"
+        _username: >-
+          {{ 'user-' + (r_ns.content | b64decode | trim | regex_replace('^showroom-', ''))
+             if (r_ns.content | b64decode | trim).startswith('showroom-')
+             else (r_ns.content | b64decode | trim | regex_replace('-scenario-[0-9]+$', '')) }}
+
+    - name: Derive scenario namespace and CR name
+      ansible.builtin.set_fact:
+        current_namespace: "{{ _username }}-scenario-1"
+        aap_cr_name: "{{ _username }}-aap"
 
     - name: Get AutomationHub CR
       ansible.builtin.uri:
