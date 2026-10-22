@@ -76,6 +76,4 @@ There is 1 issue. Focus on discovering *what* is wrong rather than knowing the f
 == Check Your Work
 
 ++++
-<div class="validate-button-placeholder" data-module="scenario-2"></div>
-<div class="solve-button-placeholder" data-module="scenario-2"></div>
 ++++
