@@ -26,28 +26,12 @@ antora:
   modules:
     - name: scenario-1
       label: "Scenario 1: Hub PVC issue"
-      solveButton: true
-      scripts:
-        - solve
-        - validation
 
     - name: scenario-2
       label: "Scenario 2: Wrong admin password / Database service missing"
-      solveButton: true
-      scripts:
-        - solve
-        - validation
 
     - name: scenario-3
       label: "Scenario 3: Wrong node selector / High resource requests"
-      solveButton: true
-      scripts:
-        - solve
-        - validation
 
     - name: scenario-4
       label: "Scenario 4: ALIA troubleshooting wrong model"
-      solveButton: true
-      scripts:
-        - solve
-        - validation
