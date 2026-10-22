@@ -5,11 +5,7 @@
   gather_facts: false
 
   vars:
-    _kc_raw: "{{ (lookup('file', k8s_kubeconfig) | from_yaml) if (k8s_kubeconfig | default('')) != '' else {} }}"
-    _token: >-
-      {{ _kc_raw.users[0].user.token
-         if (_kc_raw and (_kc_raw.users | default([])) | length > 0)
-         else lookup('file', '/var/run/secrets/kubernetes.io/serviceaccount/token') }}
+    _sa_token: "{{ lookup('file', '/var/run/secrets/kubernetes.io/serviceaccount/token') }}"
 
   tasks:
     - name: Read namespace from service account
@@ -17,10 +13,9 @@
         src: /var/run/secrets/kubernetes.io/serviceaccount/namespace
       register: r_ns
 
-    - name: Set namespace and CR name facts
+    - name: Set showroom namespace and derive username
       ansible.builtin.set_fact:
-        current_namespace: "{{ _username }}-scenario-2"
-        _raw_ns: "{{ r_ns.content | b64decode | trim }}"
+        _showroom_ns: "{{ r_ns.content | b64decode | trim }}"
         _username: >-
           {{ 'user-' + (r_ns.content | b64decode | trim | regex_replace('^showroom-', ''))
              if (r_ns.content | b64decode | trim).startswith('showroom-')
@@ -28,7 +23,24 @@
 
     - name: Derive scenario namespace and CR name
       ansible.builtin.set_fact:
+        current_namespace: "{{ _username }}-scenario-2"
         aap_cr_name: "{{ _username }}-aap"
+
+    - name: Get runtime-automation cluster-admin token from showroom namespace
+      ansible.builtin.uri:
+        url: "https://kubernetes.default.svc/api/v1/namespaces/{{ _showroom_ns }}/secrets/runtime-automation-token"
+        headers:
+          Authorization: "Bearer {{ _sa_token }}"
+        validate_certs: false
+        status_code: [200, 404]
+      register: r_ra_token
+
+    - name: Set cluster-admin token
+      ansible.builtin.set_fact:
+        _token: >-
+          {{ r_ra_token.json.data.token | b64decode
+             if r_ra_token.status == 200
+             else _sa_token }}
 
     - name: Scale gateway operator back to 1 replica
       ansible.builtin.uri:
